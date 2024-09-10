@@ -2,7 +2,7 @@ package pkg
 
 import (
 	"database/sql"
-	"fmt"
+	"errors"
 )
 
 type TasksRepository interface {
@@ -83,6 +83,17 @@ func (r *tasksRepository) DeleteTasks(ids []int) error {
 }
 
 func (r *tasksRepository) CreateTask(task Task) error {
-	fmt.Printf("added task: %s, at %v", task.Description, task.Created)
+	query := "INSERT INTO tasks (description) VALUES ($1)"
+
+	if task.Description == "" {
+		return errors.New("empty description")
+	}
+
+	_, err := r.db.Exec(query, task.Description)
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
