@@ -39,7 +39,7 @@ func (cmd *addCmd) Run(args []string) {
 		return
 	}
 
-	task := pkg.NewTask(*desc, *tag, *proj)
+	task := pkg.NewTask(*desc)
 	cmd.repo.CreateTask(task)
 
 	// task := storage.NewTask(*desc, *tag, *proj)

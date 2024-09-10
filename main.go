@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"totodo/cmd"
@@ -21,7 +22,8 @@ func main() {
 	}
 
 	// Init DB (SQL Lite)
-	db, err := pkg.NewDB(os.Getenv("DB_FILE"))
+	dbConnectionStr := fmt.Sprintf("%s?parseTime=true", os.Getenv("DB_FILE"))
+	db, err := pkg.NewDB(dbConnectionStr)
 
 	if err != nil {
 		log.Fatalf("[FATAL] %s", err.Error())

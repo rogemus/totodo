@@ -23,11 +23,54 @@ func NewTasksRepository(db *sql.DB) TasksRepository {
 
 func (r *tasksRepository) GetTask(id int) (Task, error) {
 	var task Task
+
+	query := "SELECT id, description, created FROM tasks WHERE id = $1;"
+
+	row := r.db.QueryRow(query, id)
+	err := row.Scan(
+		&task.Id,
+		&task.Description,
+		&task.Created,
+	)
+
+	if err != nil {
+		return task, err
+	}
+
 	return task, nil
 }
 
 func (r *tasksRepository) GetTasks() ([]Task, error) {
-	var tasks = make([]Task, 0)
+	query := "SELECT id, description, created FROM tasks;"
+	rows, err := r.db.Query(query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+	tasks := make([]Task, 0)
+
+	for rows.Next() {
+		var task Task
+
+		err := rows.Scan(
+			&task.Id,
+			&task.Description,
+			&task.Created,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		tasks = append(tasks, task)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return tasks, nil
 }
 
@@ -40,6 +83,6 @@ func (r *tasksRepository) DeleteTasks(ids []int) error {
 }
 
 func (r *tasksRepository) CreateTask(task Task) error {
-	fmt.Printf("added task: %s, +%s, @%s", task.Description, task.Tag, task.Project)
+	fmt.Printf("added task: %s, at %v", task.Description, task.Created)
 	return nil
 }
