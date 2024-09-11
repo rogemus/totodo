@@ -3,7 +3,6 @@ package pkg_test
 import (
 	"errors"
 	"testing"
-	"time"
 	"totodo/pkg"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -13,26 +12,26 @@ import (
 func Test_CreateTask(t *testing.T) {
 	var empty_task pkg.Task
 
-	createdDate, _ := time.Parse("2006-01-02 15:04:05", "2024-09-08 19:15:17")
 	task := pkg.Task{
-		Id:          1,
 		Description: "test task",
-		Created:     createdDate,
 	}
 
 	testCases := []struct {
 		name        string
 		task        pkg.Task
+		taskId      int64
 		expectedErr error
 	}{
 		{
 			name:        "create task",
 			task:        task,
+			taskId:      0,
 			expectedErr: nil,
 		},
 		{
 			name:        "error if empty task",
 			expectedErr: errors.New("empty description"),
+			taskId:      -1,
 			task:        empty_task,
 		},
 	}
@@ -46,12 +45,13 @@ func Test_CreateTask(t *testing.T) {
 				WithArgs(
 					test.task.Description,
 				).
-				WillReturnResult(sqlmock.NewResult(int64(test.task.Id), 1))
+				WillReturnResult(sqlmock.NewResult(test.taskId, 1))
 
 			repo := pkg.NewTasksRepository(db)
-			createErr := repo.CreateTask(test.task)
+			id, createErr := repo.CreateTask(test.task)
 
 			assert.Equal(t, test.expectedErr, createErr)
+			assert.Equal(t, test.taskId, id)
 		})
 	}
 }

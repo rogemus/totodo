@@ -2,5 +2,5 @@
 
 test:
 	@echo "Testing..."
-	go test ./test/...
+	go test ./test/... -v
 

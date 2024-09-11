@@ -8,9 +8,9 @@ import (
 type TasksRepository interface {
 	GetTask(id int) (Task, error)
 	GetTasks() ([]Task, error)
-	UpdateTask(task Task) error
-	DeleteTasks(ids []int) error
-	CreateTask(task Task) error
+	UpdateTask(task Task) (int64, error)
+	DeleteTask(id int) error
+	CreateTask(task Task) (int64, error)
 }
 
 type tasksRepository struct {
@@ -74,26 +74,40 @@ func (r *tasksRepository) GetTasks() ([]Task, error) {
 	return tasks, nil
 }
 
-func (r *tasksRepository) UpdateTask(task Task) error {
-	return nil
+func (r *tasksRepository) UpdateTask(task Task) (int64, error) {
+	return 0, nil
 }
 
-func (r *tasksRepository) DeleteTasks(ids []int) error {
-	return nil
-}
+func (r *tasksRepository) DeleteTask(id int) error {
+	query := "DELETE FROM tasks WHERE id = $1;"
 
-func (r *tasksRepository) CreateTask(task Task) error {
-	query := "INSERT INTO tasks (description) VALUES ($1)"
-
-	if task.Description == "" {
-		return errors.New("empty description")
-	}
-
-	_, err := r.db.Exec(query, task.Description)
+	_, err := r.db.Exec(query, id)
 
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (r *tasksRepository) CreateTask(task Task) (int64, error) {
+	query := "INSERT INTO tasks (description) VALUES ($1)"
+
+	if task.Description == "" {
+		return -1, errors.New("empty description")
+	}
+
+	result, err := r.db.Exec(query, task.Description)
+
+	if err != nil {
+		return -1, err
+	}
+
+	id, err := result.LastInsertId()
+
+	if err != nil {
+		return -1, err
+	}
+
+	return id, nil
 }
