@@ -9,7 +9,6 @@ import (
 )
 
 func Test_DeleteTask(t *testing.T) {
-
 	testCases := []struct {
 		name           string
 		taskId         int

@@ -8,7 +8,7 @@ import (
 type TasksRepository interface {
 	GetTask(id int) (Task, error)
 	GetTasks() ([]Task, error)
-	UpdateTask(task Task) (int64, error)
+	UpdateTask(task Task) error
 	DeleteTask(id int) error
 	CreateTask(task Task) (int64, error)
 }
@@ -22,9 +22,8 @@ func NewTasksRepository(db *sql.DB) TasksRepository {
 }
 
 func (r *tasksRepository) GetTask(id int) (Task, error) {
-	var task Task
-
 	query := "SELECT id, description, created FROM tasks WHERE id = $1;"
+	var task Task
 
 	row := r.db.QueryRow(query, id)
 	err := row.Scan(
@@ -74,8 +73,15 @@ func (r *tasksRepository) GetTasks() ([]Task, error) {
 	return tasks, nil
 }
 
-func (r *tasksRepository) UpdateTask(task Task) (int64, error) {
-	return 0, nil
+func (r *tasksRepository) UpdateTask(task Task) error {
+	query := "UPDATE tasks SET description=$2 WHERE id = $1;"
+	_, err := r.db.Exec(query, task.Id, task.Description)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *tasksRepository) DeleteTask(id int) error {
@@ -91,7 +97,7 @@ func (r *tasksRepository) DeleteTask(id int) error {
 }
 
 func (r *tasksRepository) CreateTask(task Task) (int64, error) {
-	query := "INSERT INTO tasks (description) VALUES ($1)"
+	query := "INSERT INTO tasks (description) VALUES ($1);"
 
 	if task.Description == "" {
 		return -1, errors.New("empty description")
