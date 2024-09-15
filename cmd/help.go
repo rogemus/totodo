@@ -1,7 +1,26 @@
 package cmd
 
-import "fmt"
+import (
+	"fmt"
+	"totodo/pkg"
+)
 
-func Help() {
-  fmt.Printf("Help")
+type helpCmd struct {
+	commands []pkg.Cmd
+	Cmd      string
+}
+
+func NewHelpCmd(commands []pkg.Cmd) helpCmd {
+	return helpCmd{
+		Cmd:      "help",
+		commands: commands,
+	}
+}
+
+func (cmd helpCmd) Run() {
+	fmt.Printf("Help...")
+
+	for _, cmd := range cmd.commands {
+		cmd.Help()
+	}
 }

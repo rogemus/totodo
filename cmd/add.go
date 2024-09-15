@@ -18,7 +18,7 @@ func NewAddCmd(repo pkg.TasksRepository) addCmd {
 	}
 }
 
-func (cmd *addCmd) Run(args []string) {
+func (cmd addCmd) Run(args []string) {
 	fs := flag.NewFlagSet("add", flag.ContinueOnError)
 
 	// Task description
@@ -42,8 +42,9 @@ func (cmd *addCmd) Run(args []string) {
 	task := pkg.NewTask(*desc)
 	cmd.repo.CreateTask(task)
 
-	// task := storage.NewTask(*desc, *tag, *proj)
-	// storage.DB.Add(task)
-
 	fmt.Printf("added task: %s, +%s, @%s", *desc, *tag, *proj)
+}
+
+func (cmd addCmd) Help() {
+	fmt.Println("add - help")
 }

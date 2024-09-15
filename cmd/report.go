@@ -2,16 +2,52 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"text/template"
+	"totodo/pkg"
 )
 
-func Report(args []string) {
-	argsLen := len(args)
-	reportType := ""
+type reportCmd struct {
+	Cmd  string
+	repo pkg.TasksRepository
+}
 
-	if argsLen == 0 {
-		reportType = "list"
-	} else {
-		reportType = args[0]
+func NewReportCmd(repo pkg.TasksRepository) reportCmd {
+	return reportCmd{
+		repo: repo,
+		Cmd:  "report",
 	}
-	fmt.Println("reportType", reportType)
+}
+
+func (cmd reportCmd) Run(args []string) {
+	// TODO display available reports
+	if len(args) == 0 {
+		fmt.Println("no report type selected")
+		return
+	}
+
+	reportType := args[0]
+
+	// TODO add different report types
+	switch reportType {
+	case "list":
+		// TODO use lipgoss for proper template
+		tmpl :=
+			`
+      id  |  description  |  created
+    ----------------------------------
+      {{ range . }}{{ .Id }}  |  {{ .Description }}  |  {{ .Created }}
+      {{ end }}
+    `
+		tasks, _ := cmd.repo.GetTasks()
+		t := template.Must(template.New("list").Parse(tmpl))
+
+		if err := t.Execute(os.Stdout, tasks); err != nil {
+			fmt.Printf("%v", err)
+		}
+	}
+}
+
+func (cmd reportCmd) Help() {
+  fmt.Println("repot - help")
 }

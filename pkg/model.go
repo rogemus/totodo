@@ -2,6 +2,11 @@ package pkg
 
 import "time"
 
+type Cmd interface {
+	Run(args []string)
+	Help()
+}
+
 type Task struct {
 	Id          int
 	Description string
@@ -9,10 +14,7 @@ type Task struct {
 }
 
 func NewTask(desc string) Task {
-	created := time.Now()
-
 	return Task{
-		Created:     created,
 		Description: desc,
 	}
 }
