@@ -5,15 +5,15 @@ import (
 	"os"
 	"strconv"
 	"text/template"
-	"totodo/pkg"
+	repo "totodo/pkg/repository"
 )
 
 type showCmd struct {
 	Cmd  string
-	repo pkg.TasksRepository
+	repo repo.TasksRepository
 }
 
-func NewShowCmd(repo pkg.TasksRepository) showCmd {
+func NewShowCmd(repo repo.TasksRepository) showCmd {
 	return showCmd{
 		repo: repo,
 		Cmd:  "show",

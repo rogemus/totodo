@@ -2,15 +2,15 @@ package cmd
 
 import (
 	"fmt"
-	"totodo/pkg"
+	repo "totodo/pkg/repository"
 )
 
 type editCmd struct {
 	Cmd  string
-	repo pkg.TasksRepository
+	repo repo.TasksRepository
 }
 
-func NewEditCmd(repo pkg.TasksRepository) editCmd {
+func NewEditCmd(repo repo.TasksRepository) editCmd {
 	return editCmd{
 		repo: repo,
 		Cmd:  "edit",

@@ -1,11 +1,6 @@
-package pkg
+package model
 
 import "time"
-
-type Cmd interface {
-	Run(args []string)
-	Help()
-}
 
 type Task struct {
 	Id          int

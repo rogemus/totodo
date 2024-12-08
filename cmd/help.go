@@ -2,15 +2,15 @@ package cmd
 
 import (
 	"fmt"
-	"totodo/pkg"
+	"totodo/pkg/model"
 )
 
 type helpCmd struct {
-	commands []pkg.Cmd
+	commands []model.Cmd
 	Cmd      string
 }
 
-func NewHelpCmd(commands []pkg.Cmd) helpCmd {
+func NewHelpCmd(commands []model.Cmd) helpCmd {
 	return helpCmd{
 		Cmd:      "help",
 		commands: commands,

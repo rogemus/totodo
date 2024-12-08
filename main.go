@@ -6,6 +6,8 @@ import (
 	"os"
 	"totodo/cmd"
 	"totodo/pkg"
+	"totodo/pkg/model"
+	repo "totodo/pkg/repository"
 
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
@@ -29,8 +31,9 @@ func main() {
 		log.Fatalf("[FATAL] %s", err.Error())
 	}
 
-	// Init Repository
-	tasksRepo := pkg.NewTasksRepository(db)
+	// Init Repositories
+	tasksRepo := repo.NewTasksRepository(db)
+	// trackingRepo := pkg.NewTrackingRepository(db)
 
 	// Init commands
 	addCmd := cmd.NewAddCmd(tasksRepo)
@@ -39,7 +42,7 @@ func main() {
 	startCmd := cmd.NewStartCmd(tasksRepo)
 	editCmd := cmd.NewEditCmd(tasksRepo)
 	stopCmd := cmd.NewStopCmd(tasksRepo)
-	helpCmd := cmd.NewHelpCmd([]pkg.Cmd{
+	helpCmd := cmd.NewHelpCmd([]model.Cmd{
 		addCmd,
 		editCmd,
 		reportCmd,

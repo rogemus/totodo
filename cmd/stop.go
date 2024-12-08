@@ -3,15 +3,15 @@ package cmd
 import (
 	"fmt"
 	"strconv"
-	"totodo/pkg"
+	repo "totodo/pkg/repository"
 )
 
 type stopCmd struct {
 	Cmd  string
-	repo pkg.TasksRepository
+	repo repo.TasksRepository
 }
 
-func NewStopCmd(repo pkg.TasksRepository) stopCmd {
+func NewStopCmd(repo repo.TasksRepository) stopCmd {
 	return stopCmd{
 		repo: repo,
 		Cmd:  "stop",

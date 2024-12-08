@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"os"
 	"text/template"
-	"totodo/pkg"
+	repo "totodo/pkg/repository"
 )
 
 type reportCmd struct {
 	Cmd  string
-	repo pkg.TasksRepository
+	repo repo.TasksRepository
 }
 
-func NewReportCmd(repo pkg.TasksRepository) reportCmd {
+func NewReportCmd(repo repo.TasksRepository) reportCmd {
 	return reportCmd{
 		repo: repo,
 		Cmd:  "report",
@@ -49,5 +49,5 @@ func (cmd reportCmd) Run(args []string) {
 }
 
 func (cmd reportCmd) Help() {
-  fmt.Println("repot - help")
+	fmt.Println("repot - help")
 }

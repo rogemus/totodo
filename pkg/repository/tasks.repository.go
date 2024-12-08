@@ -1,16 +1,17 @@
-package pkg
+package repository
 
 import (
 	"database/sql"
 	"errors"
+	"totodo/pkg/model"
 )
 
 type TasksRepository interface {
-	GetTask(id int) (Task, error)
-	GetTasks() ([]Task, error)
-	UpdateTask(task Task) error
+	GetTask(id int) (model.Task, error)
+	GetTasks() ([]model.Task, error)
+	UpdateTask(task model.Task) error
 	DeleteTask(id int) error
-	CreateTask(task Task) (int64, error)
+	CreateTask(task model.Task) (int64, error)
 }
 
 type tasksRepository struct {
@@ -21,9 +22,9 @@ func NewTasksRepository(db *sql.DB) TasksRepository {
 	return &tasksRepository{db}
 }
 
-func (r *tasksRepository) GetTask(id int) (Task, error) {
+func (r *tasksRepository) GetTask(id int) (model.Task, error) {
 	query := "SELECT id, description, created FROM tasks WHERE id = $1;"
-	var task Task
+	var task model.Task
 
 	row := r.db.QueryRow(query, id)
 	err := row.Scan(
@@ -39,7 +40,7 @@ func (r *tasksRepository) GetTask(id int) (Task, error) {
 	return task, nil
 }
 
-func (r *tasksRepository) GetTasks() ([]Task, error) {
+func (r *tasksRepository) GetTasks() ([]model.Task, error) {
 	query := "SELECT id, description, created FROM tasks;"
 	rows, err := r.db.Query(query)
 
@@ -48,10 +49,10 @@ func (r *tasksRepository) GetTasks() ([]Task, error) {
 	}
 
 	defer rows.Close()
-	tasks := make([]Task, 0)
+	tasks := make([]model.Task, 0)
 
 	for rows.Next() {
-		var task Task
+		var task model.Task
 
 		err := rows.Scan(
 			&task.Id,
@@ -73,7 +74,7 @@ func (r *tasksRepository) GetTasks() ([]Task, error) {
 	return tasks, nil
 }
 
-func (r *tasksRepository) UpdateTask(task Task) error {
+func (r *tasksRepository) UpdateTask(task model.Task) error {
 	query := "UPDATE tasks SET description=$2 WHERE id = $1;"
 	_, err := r.db.Exec(query, task.Id, task.Description)
 
@@ -96,7 +97,7 @@ func (r *tasksRepository) DeleteTask(id int) error {
 	return nil
 }
 
-func (r *tasksRepository) CreateTask(task Task) (int64, error) {
+func (r *tasksRepository) CreateTask(task model.Task) (int64, error) {
 	query := "INSERT INTO tasks (description) VALUES ($1);"
 
 	if task.Description == "" {

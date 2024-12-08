@@ -3,15 +3,16 @@ package cmd
 import (
 	"flag"
 	"fmt"
-	"totodo/pkg"
+	"totodo/pkg/model"
+	repo "totodo/pkg/repository"
 )
 
 type addCmd struct {
 	Cmd  string
-	repo pkg.TasksRepository
+	repo repo.TasksRepository
 }
 
-func NewAddCmd(repo pkg.TasksRepository) addCmd {
+func NewAddCmd(repo repo.TasksRepository) addCmd {
 	return addCmd{
 		repo: repo,
 		Cmd:  "add",
@@ -39,7 +40,7 @@ func (cmd addCmd) Run(args []string) {
 		return
 	}
 
-	task := pkg.NewTask(*desc)
+	task := model.NewTask(*desc)
 	cmd.repo.CreateTask(task)
 
 	fmt.Printf("added task: %s, +%s, @%s", *desc, *tag, *proj)
