@@ -33,39 +33,32 @@ func main() {
 
 	// Init Repositories
 	tasksRepo := repo.NewTasksRepository(db)
-	// trackingRepo := pkg.NewTrackingRepository(db)
 
 	// Init commands
 	addCmd := cmd.NewAddCmd(tasksRepo)
 	reportCmd := cmd.NewReportCmd(tasksRepo)
 	showCmd := cmd.NewShowCmd(tasksRepo)
-	startCmd := cmd.NewStartCmd(tasksRepo)
 	editCmd := cmd.NewEditCmd(tasksRepo)
-	stopCmd := cmd.NewStopCmd(tasksRepo)
 	helpCmd := cmd.NewHelpCmd([]model.Cmd{
 		addCmd,
 		editCmd,
 		reportCmd,
 		showCmd,
-		startCmd,
-		stopCmd,
 	})
 
 	switch command {
 	case addCmd.Cmd:
 		addCmd.Run(args)
+	case editCmd.Cmd:
+		editCmd.Run(args)
 	case reportCmd.Cmd:
 		reportCmd.Run(args)
 	case showCmd.Cmd:
 		showCmd.Run(args)
-	case startCmd.Cmd:
-		startCmd.Run(args)
-	case stopCmd.Cmd:
-		stopCmd.Run(args)
 	case helpCmd.Cmd:
 		helpCmd.Run()
 	default:
 		// TODO display available cmds
-		fmt.Printf("invalid comments")
+		fmt.Println("invalid comments")
 	}
 }

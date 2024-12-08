@@ -22,7 +22,7 @@ func NewShowCmd(repo repo.TasksRepository) showCmd {
 
 func (cmd showCmd) Run(args []string) {
 	if len(args) == 0 {
-		fmt.Println("no report type selected")
+		fmt.Println("no task id provided")
 		return
 	}
 

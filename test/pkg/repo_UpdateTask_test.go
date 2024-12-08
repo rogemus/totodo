@@ -2,25 +2,26 @@ package pkg_test
 
 import (
 	"testing"
-	"totodo/pkg"
+	"totodo/pkg/model"
+	"totodo/pkg/repository"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_UpdateTask(t *testing.T) {
-	task_original := pkg.Task{
+	task_original := model.Task{
 		Id:          1,
 		Description: "test task",
 	}
-	task_updated := pkg.Task{
+	task_updated := model.Task{
 		Id:          1,
 		Description: "udpated",
 	}
 	testCases := []struct {
 		name           string
-		originalTask   pkg.Task
-		updatedTask    pkg.Task
+		originalTask   model.Task
+		updatedTask    model.Task
 		expectedErr    error
 		expectedSqlErr error
 	}{
@@ -43,7 +44,7 @@ func Test_UpdateTask(t *testing.T) {
 				WillReturnResult(sqlmock.NewResult(1, 1)).
 				WillReturnError(test.expectedSqlErr)
 
-			repo := pkg.NewTasksRepository(db)
+			repo := repository.NewTasksRepository(db)
 			updateErr := repo.UpdateTask(test.updatedTask)
 			sqlErr := mock.ExpectationsWereMet()
 

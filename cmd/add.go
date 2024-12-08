@@ -20,6 +20,7 @@ func NewAddCmd(repo repo.TasksRepository) addCmd {
 }
 
 func (cmd addCmd) Run(args []string) {
+  // TODO if not args
 	fs := flag.NewFlagSet("add", flag.ContinueOnError)
 
 	// Task description

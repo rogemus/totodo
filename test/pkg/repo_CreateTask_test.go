@@ -3,22 +3,23 @@ package pkg_test
 import (
 	"errors"
 	"testing"
-	"totodo/pkg"
+	"totodo/pkg/model"
+	"totodo/pkg/repository"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_CreateTask(t *testing.T) {
-	var empty_task pkg.Task
+	var empty_task model.Task
 
-	task := pkg.Task{
+	task := model.Task{
 		Description: "test task",
 	}
 
 	testCases := []struct {
 		name        string
-		task        pkg.Task
+		task        model.Task
 		taskId      int64
 		expectedErr error
 	}{
@@ -47,7 +48,7 @@ func Test_CreateTask(t *testing.T) {
 				).
 				WillReturnResult(sqlmock.NewResult(test.taskId, 1))
 
-			repo := pkg.NewTasksRepository(db)
+			repo := repository.NewTasksRepository(db)
 			id, createErr := repo.CreateTask(test.task)
 
 			assert.Equal(t, test.expectedErr, createErr)

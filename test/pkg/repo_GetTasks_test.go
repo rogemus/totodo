@@ -3,21 +3,22 @@ package pkg_test
 import (
 	"testing"
 	"time"
-	"totodo/pkg"
+	"totodo/pkg/model"
+	"totodo/pkg/repository"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_GetTasks(t *testing.T) {
-	empty_tasks := make([]pkg.Task, 0)
+	empty_tasks := make([]model.Task, 0)
 	createdDate, _ := time.Parse("2006-01-02 15:04:05", "2024-09-08 19:15:17")
-	task_1 := pkg.Task{
+	task_1 := model.Task{
 		Id:          1,
 		Description: "test task",
 		Created:     createdDate,
 	}
-	task_2 := pkg.Task{
+	task_2 := model.Task{
 		Id:          1,
 		Description: "test task",
 		Created:     createdDate,
@@ -27,7 +28,7 @@ func Test_GetTasks(t *testing.T) {
 
 	testCases := []struct {
 		name        string
-		expected    []pkg.Task
+		expected    []model.Task
 		expectedErr error
 	}{
 		{
@@ -68,7 +69,7 @@ func Test_GetTasks(t *testing.T) {
 
 			defer db.Close()
 
-			repo := pkg.NewTasksRepository(db)
+			repo := repository.NewTasksRepository(db)
 			result, getErr := repo.GetTasks()
 			sqlErr := mock.ExpectationsWereMet()
 

@@ -2,7 +2,7 @@ package pkg_test
 
 import (
 	"testing"
-	"totodo/pkg"
+	"totodo/pkg/repository"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
@@ -39,7 +39,7 @@ func Test_DeleteTask(t *testing.T) {
 				WillReturnResult(sqlmock.NewResult(int64(test.taskId), 1)).
 				WillReturnError(test.expectedSqlErr)
 
-			repo := pkg.NewTasksRepository(db)
+			repo := repository.NewTasksRepository(db)
 			deleteErr := repo.DeleteTask(test.taskId)
 			sqlErr := mock.ExpectationsWereMet()
 

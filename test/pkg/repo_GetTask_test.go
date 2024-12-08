@@ -4,7 +4,8 @@ import (
 	"database/sql"
 	"testing"
 	"time"
-	"totodo/pkg"
+	"totodo/pkg/model"
+	"totodo/pkg/repository"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/google/go-cmp/cmp"
@@ -12,9 +13,9 @@ import (
 )
 
 func Test_GetTask(t *testing.T) {
-	var empty_task pkg.Task
+	var empty_task model.Task
 	createdDate, _ := time.Parse("2006-01-02 15:04:05", "2024-09-08 19:15:17")
-	task := pkg.Task{
+	task := model.Task{
 		Id:          1,
 		Description: "test task",
 		Created:     createdDate,
@@ -22,7 +23,7 @@ func Test_GetTask(t *testing.T) {
 
 	testCases := []struct {
 		name        string
-		expected    pkg.Task
+		expected    model.Task
 		taskId      int
 		expectedErr error
 	}{
@@ -63,7 +64,7 @@ func Test_GetTask(t *testing.T) {
 				WithArgs(test.expected.Id).
 				WillReturnRows(expectedRows)
 
-			repo := pkg.NewTasksRepository(db)
+			repo := repository.NewTasksRepository(db)
 			result, getErr := repo.GetTask(test.expected.Id)
 			sqlErr := mock.ExpectationsWereMet()
 
