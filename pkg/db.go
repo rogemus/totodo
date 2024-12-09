@@ -8,31 +8,17 @@ const createDb string = `
   CREATE TABLE IF NOT EXISTS tasks (
     id            INTEGER NOT NULL PRIMARY KEY,
     created       DATETIME DEFAULT CURRENT_TIMESTAMP,
-    description   TEXT NOT NULL
+    description   TEXT NOT NULL,
+    status        TEXT NOT NULL
   );
 
-  CREATE TABLE IF NOT EXISTS activeTask (
-    id                        INTEGER NOT NULL PRIMARY KEY,
-    taskid                    INTEGER,
-    trackingid                INTEGER,
-    created                   DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(taskid)       REFERENCES tasks(id),
-    FOREIGN KEY(trackingid)   REFERENCES tracking(id)
-  );
-
-  CREATE TABLE IF NOT EXISTS tracking (
-    id                    INTEGER NOT NULL PRIMARY KEY,
-    start_time            DATETIME,
-    end_time              DATETIME,
-    taskid                INTEGER,
-    created               DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(taskid)   REFERENCES tasks(id)
-  );
-
-  INSERT INTO tasks (id, description) VALUES 
-    (1, "K2-11: component"),
-    (2, "K2-47: comp v2"),
-    (3, "K2-4703: bug");
+  INSERT INTO tasks (id, description, status) VALUES 
+    (1, "K2-11: component", "todo"),
+    (2, "K2-47: comp v2", "todo"),
+    (3, "K2-64: bug comp", "done"),
+    (4, "K2-03: big bug", "todo"),
+    (5, "K2-73: error bug", "done"),
+    (6, "K2-11: bug", "active");
 `
 
 func NewDB(dbFile string) (*sql.DB, error) {

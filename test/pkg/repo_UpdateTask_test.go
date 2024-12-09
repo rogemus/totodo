@@ -39,8 +39,8 @@ func Test_UpdateTask(t *testing.T) {
 			db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 
 			mock.
-				ExpectExec("UPDATE tasks SET description=$2 WHERE id = $1;").
-				WithArgs(test.originalTask.Id, test.updatedTask.Description).
+				ExpectExec("UPDATE tasks SET description=? WHERE id = ?;").
+				WithArgs(test.updatedTask.Description, test.originalTask.Id).
 				WillReturnResult(sqlmock.NewResult(1, 1)).
 				WillReturnError(test.expectedSqlErr)
 

@@ -75,8 +75,8 @@ func (r *tasksRepository) GetTasks() ([]model.Task, error) {
 }
 
 func (r *tasksRepository) UpdateTask(task model.Task) error {
-	query := "UPDATE tasks SET description=$2 WHERE id = $1;"
-	_, err := r.db.Exec(query, task.Id, task.Description)
+	query := `UPDATE tasks SET description=? WHERE id = ?;`
+	_, err := r.db.Exec(query, task.Description, task.Id)
 
 	if err != nil {
 		return err
@@ -98,13 +98,13 @@ func (r *tasksRepository) DeleteTask(id int) error {
 }
 
 func (r *tasksRepository) CreateTask(task model.Task) (int64, error) {
-	query := "INSERT INTO tasks (description) VALUES ($1);"
+	query := "INSERT INTO tasks (description, status) VALUES ($1, $2);"
 
 	if task.Description == "" {
 		return -1, errors.New("empty description")
 	}
 
-	result, err := r.db.Exec(query, task.Description)
+	result, err := r.db.Exec(query, task.Description, task.Status)
 
 	if err != nil {
 		return -1, err

@@ -15,8 +15,6 @@ import (
 
 func main() {
 	var err error
-	command := os.Args[1]
-	args := os.Args[2:]
 
 	// Read .env
 	if err = godotenv.Load(); err != nil {
@@ -38,7 +36,7 @@ func main() {
 	addCmd := cmd.NewAddCmd(tasksRepo)
 	reportCmd := cmd.NewReportCmd(tasksRepo)
 	showCmd := cmd.NewShowCmd(tasksRepo)
-	editCmd := cmd.NewDeleteCmd(tasksRepo)
+	editCmd := cmd.NewEditCmd(tasksRepo)
 	deleteCmd := cmd.NewDeleteCmd(tasksRepo)
 	helpCmd := cmd.NewHelpCmd([]model.Cmd{
 		addCmd,
@@ -47,6 +45,14 @@ func main() {
 		reportCmd,
 		showCmd,
 	})
+
+	if len(os.Args) == 1 {
+		helpCmd.Run()
+		return
+	}
+
+	command := os.Args[1]
+	args := os.Args[2:]
 
 	switch command {
 	case deleteCmd.Cmd:

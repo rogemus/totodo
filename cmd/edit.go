@@ -41,6 +41,8 @@ func NewEditCmd(repo repo.TasksRepository) editCmd {
 
 	set.IntVar(&editFlagValues.idFlag, "id", 0, "`id` of the task")
 	set.IntVar(&editFlagValues.idFlag, "i", 0, "`id` of the task")
+	set.StringVar(&editFlagValues.descFlag, "desc", "", "`description` of the task")
+	set.StringVar(&editFlagValues.descFlag, "d", "", "`description` of the task")
 	set.BoolVar(&editFlagValues.helpFlag, "help", false, "help")
 	set.BoolVar(&editFlagValues.helpFlag, "h", false, "help")
 

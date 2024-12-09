@@ -42,9 +42,10 @@ func Test_CreateTask(t *testing.T) {
 			db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 
 			mock.
-				ExpectExec("INSERT INTO tasks (description) VALUES ($1);").
+				ExpectExec("INSERT INTO tasks (description, status) VALUES ($1, $2);").
 				WithArgs(
 					test.task.Description,
+					test.task.Status,
 				).
 				WillReturnResult(sqlmock.NewResult(test.taskId, 1))
 

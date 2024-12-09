@@ -4,8 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"text/template"
+	"strconv"
+	"time"
 	repo "totodo/pkg/repository"
+
+	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/lipgloss/table"
 )
 
 type reportCmd struct {
@@ -41,8 +45,8 @@ func NewReportCmd(repo repo.TasksRepository) reportCmd {
 	cmd := "report"
 
 	set := flag.NewFlagSet(cmd, flag.ContinueOnError)
-	set.StringVar(&reportFlagValues.reportTypeFlag, "type", "list", "type od the report")
-	set.StringVar(&reportFlagValues.reportTypeFlag, "t", "list", "type od the report")
+	set.StringVar(&reportFlagValues.reportTypeFlag, "type", "", "type od the report")
+	set.StringVar(&reportFlagValues.reportTypeFlag, "t", "", "type od the report")
 	set.BoolVar(&reportFlagValues.listTypesFlag, "list-types", false, "list-types")
 	set.BoolVar(&reportFlagValues.listTypesFlag, "ls", false, "list-types")
 	set.BoolVar(&reportFlagValues.helpFlag, "help", false, "help")
@@ -60,24 +64,49 @@ func NewReportCmd(repo repo.TasksRepository) reportCmd {
 }
 
 func (cmd reportCmd) listReport() {
-	// TODO use lipgoss for proper template
-	tmpl :=
-		`
-      id  |  description  |  created
-    ----------------------------------
-      {{ range . }}{{ .Id }}  |  {{ .Description }}  |  {{ .Created }}
-      {{ end }}
-    `
-	tasks, _ := cmd.repo.GetTasks()
-	t := template.Must(template.New("list").Parse(tmpl))
+	re := lipgloss.NewRenderer(os.Stdout)
 
-	if err := t.Execute(os.Stdout, tasks); err != nil {
-		fmt.Printf("%v", err)
+	var (
+		HeaderStyle = re.NewStyle().
+				Foreground(lipgloss.Color("99")).
+				Bold(true).
+				Padding(0, 1).
+				Align(lipgloss.Center)
+		CellStyle = re.NewStyle().
+				Padding(0, 1)
+	)
+
+	t := table.New().
+		Border(lipgloss.NormalBorder()).
+		Headers("Task ID", "Description", "Created").
+		StyleFunc(func(row, col int) lipgloss.Style {
+			var style lipgloss.Style
+
+			switch {
+			case row == table.HeaderRow:
+				return HeaderStyle
+			default:
+				style = CellStyle
+			}
+
+			return style
+		})
+
+	tasks, _ := cmd.repo.GetTasks()
+
+	for _, task := range tasks {
+		t.Row(strconv.Itoa(task.Id), task.Description, task.Created.Format(time.DateTime))
 	}
+
+	fmt.Println(t)
 }
 
-func (cmd reportCmd) listReportType() {
-	fmt.Print("List report types...")
+func (cmd reportCmd) listReportTypes() {
+	types := `Available list types:
+    list      <description>
+    timeline  <description>
+  `
+	fmt.Print(types)
 }
 
 func (cmd reportCmd) Run(args []string) {
@@ -92,13 +121,15 @@ func (cmd reportCmd) Run(args []string) {
 	}
 
 	if *&reportFlagValues.listTypesFlag {
-		cmd.listReportType()
+		cmd.listReportTypes()
 		return
 	}
 
 	switch *&reportFlagValues.reportTypeFlag {
 	case "list":
 		cmd.listReport()
+	default:
+		cmd.listReportTypes()
 	}
 }
 
