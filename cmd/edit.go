@@ -3,54 +3,94 @@ package cmd
 import (
 	"flag"
 	"fmt"
+	"time"
 	repo "totodo/pkg/repository"
 )
 
 type editCmd struct {
 	Cmd  string
 	repo repo.TasksRepository
+	fs   *flag.FlagSet
+}
+
+var editFlagValues = struct {
+	idFlag   int
+	descFlag string
+	helpFlag bool
+}{
+	idFlag:   0,
+	descFlag: "",
+	helpFlag: false,
 }
 
 func NewEditCmd(repo repo.TasksRepository) editCmd {
+	cmd := "edit"
+	set := flag.NewFlagSet(cmd, flag.ContinueOnError)
+
+	set.IntVar(&editFlagValues.idFlag, "id", 0, "`id` of the task")
+	set.IntVar(&editFlagValues.idFlag, "i", 0, "`id` of the task")
+	set.StringVar(&editFlagValues.descFlag, "desc", "", "`description` of the task")
+	set.StringVar(&editFlagValues.descFlag, "d", "", "`description` of the task")
+	set.BoolVar(&editFlagValues.helpFlag, "help", false, "help")
+	set.BoolVar(&editFlagValues.helpFlag, "h", false, "help")
+
+	set.Usage = func() {
+		const usage = `Edit task:
+      -i, --id id of the task
+      -d, --desc description of the task
+      -h, --help prints help information
+    `
+		fmt.Print(usage)
+	}
+
 	return editCmd{
 		repo: repo,
-		Cmd:  "edit",
+		Cmd:  cmd,
+		fs:   set,
 	}
 }
 
 func (cmd editCmd) Run(args []string) {
-	if len(args) == 0 {
-		fmt.Println("no args")
-		return
-	}
-
-	// TODO if not args
-	fs := flag.NewFlagSet("edit", flag.ContinueOnError)
-	id := fs.Int("id", 0, "`id` of the task")
-	fs.IntVar(id, "i", *id, "alias for -id")
-
-	// Task description
-	desc := fs.String("desc", "", "`description` of the task")
-	fs.StringVar(desc, "d", *desc, "alias for -desc")
-
-	if err := fs.Parse(args); err != nil {
+	if err := cmd.fs.Parse(args); err != nil {
 		fmt.Printf("error: %s", err)
 		return
 	}
 
-
-	task, _ := cmd.repo.GetTask(*id)
-
-	if *desc != "" {
-		task.Description = *desc
+	if *&editFlagValues.helpFlag {
+		cmd.Help()
+		return
 	}
 
-	cmd.repo.UpdateTask(task)
+	if *&editFlagValues.idFlag == 0 {
+		fmt.Print("Id not provided. Available options: \n\n")
+		cmd.Help()
+		return
+	}
 
-	fmt.Println(task.Description)
-	fmt.Printf("edited task: %d, %s", *id, *desc)
+	if *&editFlagValues.descFlag == "" {
+		fmt.Print("No description provided. Available options: \n\n")
+		cmd.Help()
+		return
+	}
+
+	task, err := cmd.repo.GetTask(*&editFlagValues.idFlag)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	task.Description = *&editFlagValues.descFlag
+	err = cmd.repo.UpdateTask(task)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf("Task Updated: [%d] (@%s) %s", task.Id, task.Created.Format(time.DateTime), task.Description)
 }
 
 func (cmd editCmd) Help() {
-	fmt.Println("edit - help")
+	cmd.fs.Usage()
 }

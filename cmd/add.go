@@ -3,6 +3,7 @@ package cmd
 import (
 	"flag"
 	"fmt"
+	"time"
 	"totodo/pkg/model"
 	repo "totodo/pkg/repository"
 )
@@ -10,43 +11,69 @@ import (
 type addCmd struct {
 	Cmd  string
 	repo repo.TasksRepository
+	fs   *flag.FlagSet
+}
+
+var addFlagValues = struct {
+	descFlag string
+	helpFlag bool
+}{
+	descFlag: "",
+	helpFlag: false,
 }
 
 func NewAddCmd(repo repo.TasksRepository) addCmd {
+	cmd := "add"
+	set := flag.NewFlagSet(cmd, flag.ContinueOnError)
+
+	set.StringVar(&addFlagValues.descFlag, "desc", "", "`description` of the task")
+	set.StringVar(&addFlagValues.descFlag, "d", "", "`description` of the task")
+	set.BoolVar(&addFlagValues.helpFlag, "help", false, "help")
+	set.BoolVar(&addFlagValues.helpFlag, "h", false, "help")
+
+	set.Usage = func() {
+		const usage = `Create task:
+      -d, --desc description of the task
+      -h, --help prints help information
+    `
+		fmt.Print(usage)
+	}
+
 	return addCmd{
 		repo: repo,
-		Cmd:  "add",
+		Cmd:  cmd,
+		fs:   set,
 	}
 }
 
 func (cmd addCmd) Run(args []string) {
-  // TODO if not args
-	fs := flag.NewFlagSet("add", flag.ContinueOnError)
-
-	// Task description
-	desc := fs.String("desc", "", "`description` of the task")
-	fs.StringVar(desc, "d", *desc, "alias for -desc")
-
-	// Task tags
-	// TODO: support multiple tags
-	tag := fs.String("tag", "", "`tags` of the task")
-	fs.StringVar(tag, "t", *tag, "alias for -tag")
-
-	// Task project
-	proj := fs.String("proj", "", "`project` of the task")
-	fs.StringVar(proj, "p", *proj, "alias for -p")
-
-	if err := fs.Parse(args); err != nil {
+	if err := cmd.fs.Parse(args); err != nil {
 		fmt.Printf("error: %s", err)
 		return
 	}
 
-	task := model.NewTask(*desc)
-	cmd.repo.CreateTask(task)
+	if *&addFlagValues.helpFlag {
+		cmd.Help()
+		return
+	}
 
-	fmt.Printf("added task: %s, +%s, @%s", *desc, *tag, *proj)
+	if *&addFlagValues.descFlag == "" {
+		fmt.Print("No description provided. Available options: \n\n")
+		cmd.Help()
+		return
+	}
+
+	task := model.NewTask(*&addFlagValues.descFlag)
+	taskId, err := cmd.repo.CreateTask(task)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf("Task Created: [%d] (@%s) %s", taskId, task.Created.Format(time.DateTime), task.Description)
 }
 
 func (cmd addCmd) Help() {
-	fmt.Println("add - help")
+	cmd.fs.Usage()
 }

@@ -9,7 +9,10 @@ type Task struct {
 }
 
 func NewTask(desc string) Task {
+	created := time.Now()
+
 	return Task{
 		Description: desc,
+		Created:     created,
 	}
 }
