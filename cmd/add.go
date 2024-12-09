@@ -22,6 +22,16 @@ var addFlagValues = struct {
 	helpFlag: false,
 }
 
+const addUsageLong = `
+  Create task:
+    -d, --desc  description of the task
+    -h, --help  prints help information
+`
+const addUsageShort = `
+  Create task:
+    -d, --desc  description of the task
+`
+
 func NewAddCmd(repo repo.TasksRepository) addCmd {
 	cmd := "add"
 	set := flag.NewFlagSet(cmd, flag.ContinueOnError)
@@ -32,11 +42,7 @@ func NewAddCmd(repo repo.TasksRepository) addCmd {
 	set.BoolVar(&addFlagValues.helpFlag, "h", false, "help")
 
 	set.Usage = func() {
-		const usage = `Create task:
-      -d, --desc description of the task
-      -h, --help prints help information
-    `
-		fmt.Print(usage)
+		fmt.Print(addUsageLong)
 	}
 
 	return addCmd{
@@ -76,4 +82,8 @@ func (cmd addCmd) Run(args []string) {
 
 func (cmd addCmd) Help() {
 	cmd.fs.Usage()
+}
+
+func (cmd addCmd) ShortHelp() {
+	fmt.Print(addUsageShort)
 }

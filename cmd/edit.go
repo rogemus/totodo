@@ -23,24 +23,29 @@ var editFlagValues = struct {
 	helpFlag: false,
 }
 
+const editUsageLong = `
+  Edit task:
+    -i, --id    id of the task
+    -d, --desc  description of the task
+    -h, --help  prints help information
+`
+const editUsageShort = `
+  Edit task:
+    -i, --id    id of the task
+    -d, --desc  description of the task
+`
+
 func NewEditCmd(repo repo.TasksRepository) editCmd {
 	cmd := "edit"
 	set := flag.NewFlagSet(cmd, flag.ContinueOnError)
 
 	set.IntVar(&editFlagValues.idFlag, "id", 0, "`id` of the task")
 	set.IntVar(&editFlagValues.idFlag, "i", 0, "`id` of the task")
-	set.StringVar(&editFlagValues.descFlag, "desc", "", "`description` of the task")
-	set.StringVar(&editFlagValues.descFlag, "d", "", "`description` of the task")
 	set.BoolVar(&editFlagValues.helpFlag, "help", false, "help")
 	set.BoolVar(&editFlagValues.helpFlag, "h", false, "help")
 
 	set.Usage = func() {
-		const usage = `Edit task:
-      -i, --id id of the task
-      -d, --desc description of the task
-      -h, --help prints help information
-    `
-		fmt.Print(usage)
+		fmt.Print(editUsageLong)
 	}
 
 	return editCmd{
@@ -93,4 +98,8 @@ func (cmd editCmd) Run(args []string) {
 
 func (cmd editCmd) Help() {
 	cmd.fs.Usage()
+}
+
+func (cmd editCmd) ShortHelp() {
+	fmt.Print(editUsageShort)
 }

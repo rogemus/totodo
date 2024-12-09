@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"totodo/pkg/model"
 )
 
@@ -18,9 +17,7 @@ func NewHelpCmd(commands []model.Cmd) helpCmd {
 }
 
 func (cmd helpCmd) Run() {
-	fmt.Printf("Help...")
-
 	for _, cmd := range cmd.commands {
-		cmd.Help()
+		cmd.ShortHelp()
 	}
 }

@@ -38,15 +38,19 @@ func main() {
 	addCmd := cmd.NewAddCmd(tasksRepo)
 	reportCmd := cmd.NewReportCmd(tasksRepo)
 	showCmd := cmd.NewShowCmd(tasksRepo)
-	editCmd := cmd.NewEditCmd(tasksRepo)
+	editCmd := cmd.NewDeleteCmd(tasksRepo)
+	deleteCmd := cmd.NewDeleteCmd(tasksRepo)
 	helpCmd := cmd.NewHelpCmd([]model.Cmd{
 		addCmd,
+		deleteCmd,
 		editCmd,
 		reportCmd,
 		showCmd,
 	})
 
 	switch command {
+	case deleteCmd.Cmd:
+		deleteCmd.Run(args)
 	case addCmd.Cmd:
 		addCmd.Run(args)
 	case editCmd.Cmd:
@@ -58,7 +62,7 @@ func main() {
 	case helpCmd.Cmd:
 		helpCmd.Run()
 	default:
-		// TODO display available cmds
-		fmt.Println("invalid comments")
+		fmt.Println("Invalid comand. See available options:")
+		helpCmd.Run()
 	}
 }
