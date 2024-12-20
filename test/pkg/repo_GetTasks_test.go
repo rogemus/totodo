@@ -17,11 +17,13 @@ func Test_GetTasks(t *testing.T) {
 		Id:          1,
 		Description: "test task",
 		Created:     createdDate,
+		Status:      "todo",
 	}
 	task_2 := model.Task{
-		Id:          1,
-		Description: "test task",
+		Id:          2,
+		Description: "test task 2",
 		Created:     createdDate,
+		Status:      "todo",
 	}
 	tasks := append(empty_tasks, task_1)
 	tasks = append(tasks, task_2)
@@ -51,6 +53,7 @@ func Test_GetTasks(t *testing.T) {
 				"id",
 				"description",
 				"created",
+				"status",
 			}
 			expectedRows := sqlmock.NewRows(columns)
 
@@ -59,11 +62,12 @@ func Test_GetTasks(t *testing.T) {
 					task.Id,
 					task.Description,
 					task.Created,
+					task.Status,
 				)
 			}
 
 			mock.
-				ExpectQuery("SELECT id, description, created FROM tasks;").
+				ExpectQuery("SELECT id, description, created, status FROM tasks;").
 				WithoutArgs().
 				WillReturnRows(expectedRows)
 

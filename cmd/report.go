@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"time"
+	"totodo/pkg/model"
 	repo "totodo/pkg/repository"
+	"totodo/pkg/ui"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
@@ -38,7 +39,6 @@ const reportUsageShort = `
   Report task:
     -t, --type         typo of the report
     -lt, --list-types  list available reports type
-    -d, --desc         description of the task
 `
 
 func NewReportCmd(repo repo.TasksRepository) reportCmd {
@@ -63,42 +63,105 @@ func NewReportCmd(repo repo.TasksRepository) reportCmd {
 	}
 }
 
+func GroupByStatus(tasks []model.Task) ([]model.Task, []model.Task, []model.Task) {
+	doneTasks := make([]model.Task, 0)
+	todoTasks := make([]model.Task, 0)
+	activeTasks := make([]model.Task, 0)
+
+	for _, task := range tasks {
+		switch task.Status {
+		case model.Status.ACTIVE:
+			activeTasks = append(activeTasks, task)
+
+		case model.Status.TODO:
+			todoTasks = append(todoTasks, task)
+
+		case model.Status.DONE:
+			doneTasks = append(doneTasks, task)
+		}
+	}
+
+	return activeTasks, todoTasks, doneTasks
+}
+
 func (cmd reportCmd) listReport() {
 	re := lipgloss.NewRenderer(os.Stdout)
 
 	var (
-		HeaderStyle = re.NewStyle().
-				Foreground(lipgloss.Color("99")).
-				Bold(true).
-				Padding(0, 1).
-				Align(lipgloss.Center)
-		CellStyle = re.NewStyle().
-				Padding(0, 1)
+		CellStyle    = re.NewStyle().Padding(0, 1)
+		IndexStyle   = CellStyle.Foreground(ui.NormalColors.Dim).Width(3)
+		CreatedStyle = CellStyle.Foreground(ui.NormalColors.Dim)
+
+		TodoStatusStyles = CellStyle.Foreground(ui.BrightColors.Blue).Width(3)
+		TodoTitleStyles  = CellStyle.Foreground(ui.NormalColors.Blue)
+
+		DoneStatusStyles = CellStyle.Foreground(ui.NormalColors.Green).Width(3)
+		DoneTitleStyles  = CellStyle.Foreground(ui.NormalColors.Dim).Strikethrough(true)
+
+		ActiveStatusStyles = re.NewStyle().Foreground(ui.BrightColors.Yellow).Width(1)
+		ActiveTitleStyles  = CellStyle.Foreground(ui.NormalColors.Yellow).Underline(true)
+
+		GreenTextStyles  = re.NewStyle().Foreground(ui.NormalColors.Green)
+		YellowTextStyles = re.NewStyle().Foreground(ui.NormalColors.Yellow)
+		BlueTextStyles   = re.NewStyle().Foreground(ui.NormalColors.Blue)
+		DimTextStyles    = re.NewStyle().Foreground(ui.NormalColors.Dim)
 	)
 
-	t := table.New().
-		Border(lipgloss.NormalBorder()).
-		Headers("Task ID", "Description", "Created").
-		StyleFunc(func(row, col int) lipgloss.Style {
-			var style lipgloss.Style
-
-			switch {
-			case row == table.HeaderRow:
-				return HeaderStyle
-			default:
-				style = CellStyle
-			}
-
-			return style
-		})
-
 	tasks, _ := cmd.repo.GetTasks()
+	activeTasks, todoTasks, doneTasks := GroupByStatus(tasks)
 
-	for _, task := range tasks {
-		t.Row(strconv.Itoa(task.Id), task.Description, task.Created.Format(time.DateTime))
+	t := table.New().Border(lipgloss.HiddenBorder())
+
+	for _, task := range activeTasks {
+		idCol := IndexStyle.Render(strconv.Itoa(task.Id))
+		statusIcon := task.GetStatusIcon()
+		createdCol := CreatedStyle.Render(task.GetTimeSinceCreation())
+		statusCol := TodoStatusStyles.Render(statusIcon)
+		titleCol := fmt.Sprintf("%s%s", ActiveTitleStyles.Render(task.Description), ActiveStatusStyles.Render("★"))
+
+		t.Row(idCol, statusCol, titleCol, createdCol)
 	}
 
+	t.Row("", "", "", "")
+
+	for _, task := range todoTasks {
+		idCol := IndexStyle.Render(strconv.Itoa(task.Id))
+		statusIcon := task.GetStatusIcon()
+		createdCol := CreatedStyle.Render(task.GetTimeSinceCreation())
+		statusCol := TodoStatusStyles.Render(statusIcon)
+		titleCol := TodoTitleStyles.Render(task.Description)
+
+		t.Row(idCol, statusCol, titleCol, createdCol)
+	}
+
+	for _, task := range doneTasks {
+		idCol := IndexStyle.Render(strconv.Itoa(task.Id))
+		statusIcon := task.GetStatusIcon()
+		createdCol := CreatedStyle.Render(task.GetTimeSinceCreation())
+		statusCol := DoneStatusStyles.Render(statusIcon)
+		titleCol := DoneTitleStyles.Render(task.Description)
+
+		t.Row(idCol, statusCol, titleCol, createdCol)
+	}
+
+	separatot := "⋅"
+	activeCount := YellowTextStyles.Render(fmt.Sprintf("%d", len(activeTasks)))
+	activeLabel := DimTextStyles.Render(fmt.Sprintf("active %s", separatot))
+	todoCount := BlueTextStyles.Render(fmt.Sprintf("%d", len(todoTasks)))
+	todoLabel := DimTextStyles.Render(fmt.Sprintf("pending %s", separatot))
+	doneCount := GreenTextStyles.Render(fmt.Sprintf("%d", len(doneTasks)))
+	doneLabel := DimTextStyles.Render(fmt.Sprintf("done %s", separatot))
+
 	fmt.Println(t)
+	fmt.Println(CellStyle.Render(fmt.Sprintf(
+		"%s %s %s %s %s %s",
+		activeCount,
+		activeLabel,
+		todoCount,
+		todoLabel,
+		doneCount,
+		doneLabel,
+	)))
 }
 
 func (cmd reportCmd) listReportTypes() {

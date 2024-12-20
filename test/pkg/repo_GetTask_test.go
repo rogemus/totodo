@@ -19,6 +19,7 @@ func Test_GetTask(t *testing.T) {
 		Id:          1,
 		Description: "test task",
 		Created:     createdDate,
+		Status:      "todo",
 	}
 
 	testCases := []struct {
@@ -47,6 +48,7 @@ func Test_GetTask(t *testing.T) {
 				"id",
 				"description",
 				"created",
+				"status",
 			}
 			expectedRows := sqlmock.NewRows(columns)
 
@@ -56,11 +58,12 @@ func Test_GetTask(t *testing.T) {
 						test.expected.Id,
 						test.expected.Description,
 						test.expected.Created,
+						test.expected.Status,
 					)
 			}
 
 			mock.
-				ExpectQuery("SELECT id, description, created FROM tasks WHERE id = $1;").
+				ExpectQuery("SELECT id, description, created, status FROM tasks WHERE id = $1;").
 				WithArgs(test.expected.Id).
 				WillReturnRows(expectedRows)
 

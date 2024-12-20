@@ -23,7 +23,7 @@ func NewTasksRepository(db *sql.DB) TasksRepository {
 }
 
 func (r *tasksRepository) GetTask(id int) (model.Task, error) {
-	query := "SELECT id, description, created FROM tasks WHERE id = $1;"
+	query := "SELECT id, description, created, status FROM tasks WHERE id = $1;"
 	var task model.Task
 
 	row := r.db.QueryRow(query, id)
@@ -31,6 +31,7 @@ func (r *tasksRepository) GetTask(id int) (model.Task, error) {
 		&task.Id,
 		&task.Description,
 		&task.Created,
+		&task.Status,
 	)
 
 	if err != nil {
@@ -41,7 +42,7 @@ func (r *tasksRepository) GetTask(id int) (model.Task, error) {
 }
 
 func (r *tasksRepository) GetTasks() ([]model.Task, error) {
-	query := "SELECT id, description, created FROM tasks;"
+	query := "SELECT id, description, created, status FROM tasks;"
 	rows, err := r.db.Query(query)
 
 	if err != nil {
@@ -58,6 +59,7 @@ func (r *tasksRepository) GetTasks() ([]model.Task, error) {
 			&task.Id,
 			&task.Description,
 			&task.Created,
+			&task.Status,
 		)
 
 		if err != nil {
