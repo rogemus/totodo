@@ -9,26 +9,26 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_UpdateTask(t *testing.T) {
-	task_original := model.Task{
-		Id:          1,
-		Description: "test task",
+func Test_UpdateList(t *testing.T) {
+	list_original := model.List{
+		Id:   1,
+		Name: "test list",
 	}
-	task_updated := model.Task{
-		Id:          1,
-		Description: "udpated",
+	list_updated := model.List{
+		Id:   1,
+		Name: "udpated",
 	}
 	testCases := []struct {
 		name           string
-		originalTask   model.Task
-		updatedTask    model.Task
+		originalList   model.List
+		updatedList    model.List
 		expectedErr    error
 		expectedSqlErr error
 	}{
 		{
 			name:           "update task",
-			originalTask:   task_original,
-			updatedTask:    task_updated,
+			originalList:   list_original,
+			updatedList:    list_updated,
 			expectedErr:    nil,
 			expectedSqlErr: nil,
 		},
@@ -38,14 +38,22 @@ func Test_UpdateTask(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 
+			query := `
+        UPDATE 
+          lists AS l
+        SET
+          l.name = $2
+        WHERE
+          l.id = $1;
+      `
 			mock.
-				ExpectExec("UPDATE tasks SET description=? WHERE id = ?;").
-				WithArgs(test.updatedTask.Description, test.originalTask.Id).
+				ExpectExec(query).
+				WithArgs(test.updatedList.Name, test.originalList.Id).
 				WillReturnResult(sqlmock.NewResult(1, 1)).
 				WillReturnError(test.expectedSqlErr)
 
-			repo := repository.NewTasksRepository(db)
-			updateErr := repo.UpdateTask(test.updatedTask)
+			repo := repository.NewListRepository(db)
+			updateErr := repo.UpdateList(test.updatedList)
 			sqlErr := mock.ExpectationsWereMet()
 
 			assert.Equal(t, test.expectedErr, updateErr)

@@ -46,6 +46,7 @@ func main() {
 		showCmd,
 	})
 
+	// TODO: run TUI
 	if len(os.Args) == 1 {
 		helpCmd.Run()
 		return

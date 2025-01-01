@@ -3,7 +3,6 @@ package cmd
 import (
 	"flag"
 	"fmt"
-	"os"
 	"strconv"
 	"totodo/pkg/model"
 	repo "totodo/pkg/repository"
@@ -11,6 +10,13 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
+)
+
+var (
+	GreenTextStyles  = lipgloss.NewStyle().Foreground(ui.NormalColors.Green)
+	YellowTextStyles = lipgloss.NewStyle().Foreground(ui.NormalColors.Yellow)
+	BlueTextStyles   = lipgloss.NewStyle().Foreground(ui.NormalColors.Blue)
+	DimTextStyles    = lipgloss.NewStyle().Foreground(ui.NormalColors.Dim)
 )
 
 type reportCmd struct {
@@ -85,10 +91,8 @@ func GroupByStatus(tasks []model.Task) ([]model.Task, []model.Task, []model.Task
 }
 
 func (cmd reportCmd) listReport() {
-	re := lipgloss.NewRenderer(os.Stdout)
-
 	var (
-		CellStyle    = re.NewStyle().Padding(0, 1)
+		CellStyle    = lipgloss.NewStyle().Padding(0, 1)
 		IndexStyle   = CellStyle.Foreground(ui.NormalColors.Dim).Width(3)
 		CreatedStyle = CellStyle.Foreground(ui.NormalColors.Dim)
 
@@ -98,13 +102,10 @@ func (cmd reportCmd) listReport() {
 		DoneStatusStyles = CellStyle.Foreground(ui.NormalColors.Green).Width(3)
 		DoneTitleStyles  = CellStyle.Foreground(ui.NormalColors.Dim).Strikethrough(true)
 
-		ActiveStatusStyles = re.NewStyle().Foreground(ui.BrightColors.Yellow).Width(1)
+		ActiveStatusStyles = lipgloss.NewStyle().Foreground(ui.BrightColors.Yellow).Width(1)
 		ActiveTitleStyles  = CellStyle.Foreground(ui.NormalColors.Yellow).Underline(true)
 
-		GreenTextStyles  = re.NewStyle().Foreground(ui.NormalColors.Green)
-		YellowTextStyles = re.NewStyle().Foreground(ui.NormalColors.Yellow)
-		BlueTextStyles   = re.NewStyle().Foreground(ui.NormalColors.Blue)
-		DimTextStyles    = re.NewStyle().Foreground(ui.NormalColors.Dim)
+		ListTitleStyles = CellStyle.Foreground(ui.NormalColors.Cyan)
 	)
 
 	tasks, _ := cmd.repo.GetTasks()
@@ -118,8 +119,9 @@ func (cmd reportCmd) listReport() {
 		createdCol := CreatedStyle.Render(task.GetTimeSinceCreation())
 		statusCol := TodoStatusStyles.Render(statusIcon)
 		titleCol := fmt.Sprintf("%s%s", ActiveTitleStyles.Render(task.Description), ActiveStatusStyles.Render("★"))
+		listCol := ListTitleStyles.Render(fmt.Sprintf("@%s", task.ListName))
 
-		t.Row(idCol, statusCol, titleCol, createdCol)
+		t.Row(idCol, statusCol, titleCol, createdCol, listCol)
 	}
 
 	t.Row("", "", "", "")
@@ -130,8 +132,9 @@ func (cmd reportCmd) listReport() {
 		createdCol := CreatedStyle.Render(task.GetTimeSinceCreation())
 		statusCol := TodoStatusStyles.Render(statusIcon)
 		titleCol := TodoTitleStyles.Render(task.Description)
+		listCol := ListTitleStyles.Render(fmt.Sprintf("@%s", task.ListName))
 
-		t.Row(idCol, statusCol, titleCol, createdCol)
+		t.Row(idCol, statusCol, titleCol, createdCol, listCol)
 	}
 
 	for _, task := range doneTasks {
@@ -140,8 +143,9 @@ func (cmd reportCmd) listReport() {
 		createdCol := CreatedStyle.Render(task.GetTimeSinceCreation())
 		statusCol := DoneStatusStyles.Render(statusIcon)
 		titleCol := DoneTitleStyles.Render(task.Description)
+		listCol := ListTitleStyles.Render(fmt.Sprintf("@%s", task.ListName))
 
-		t.Row(idCol, statusCol, titleCol, createdCol)
+		t.Row(idCol, statusCol, titleCol, createdCol, listCol)
 	}
 
 	separatot := "⋅"

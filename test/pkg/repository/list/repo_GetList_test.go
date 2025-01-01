@@ -12,30 +12,29 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_GetTask(t *testing.T) {
-	var empty_task model.Task
+func Test_GetList(t *testing.T) {
+	var empty_list model.List
 	createdDate, _ := time.Parse("2006-01-02 15:04:05", "2024-09-08 19:15:17")
-	task := model.Task{
-		Id:          1,
-		Description: "test task",
-		Created:     createdDate,
-		Status:      "todo",
+	list := model.List{
+		Id:      1,
+		Name:    "test list",
+		Created: createdDate,
 	}
 
 	testCases := []struct {
 		name        string
-		expected    model.Task
-		taskId      int
+		expected    model.List
+		listId      int
 		expectedErr error
 	}{
 		{
-			name:        "returns task",
-			expected:    task,
+			name:        "returns list",
+			expected:    list,
 			expectedErr: nil,
 		},
 		{
-			name:        "returns empty task",
-			expected:    empty_task,
+			name:        "returns empty list",
+			expected:    empty_list,
 			expectedErr: sql.ErrNoRows,
 		},
 	}
@@ -46,29 +45,37 @@ func Test_GetTask(t *testing.T) {
 
 			columns := []string{
 				"id",
-				"description",
+				"name",
 				"created",
-				"status",
 			}
 			expectedRows := sqlmock.NewRows(columns)
 
-			if !cmp.Equal(test.expected, empty_task) {
+			if !cmp.Equal(test.expected, empty_list) {
 				expectedRows.
 					AddRow(
 						test.expected.Id,
-						test.expected.Description,
+						test.expected.Name,
 						test.expected.Created,
-						test.expected.Status,
 					)
 			}
 
+			query := `
+        SELECT
+          l.id,
+          l.name,
+          l.created
+        FROM
+          lists AS l
+        WHERE
+          l.id = $1;`
+
 			mock.
-				ExpectQuery("SELECT id, description, created, status FROM tasks WHERE id = $1;").
+				ExpectQuery(query).
 				WithArgs(test.expected.Id).
 				WillReturnRows(expectedRows)
 
-			repo := repository.NewTasksRepository(db)
-			result, getErr := repo.GetTask(test.expected.Id)
+			repo := repository.NewListRepository(db)
+			result, getErr := repo.GetList(test.expected.Id)
 			sqlErr := mock.ExpectationsWereMet()
 
 			assert.Equal(t, sqlErr, nil)

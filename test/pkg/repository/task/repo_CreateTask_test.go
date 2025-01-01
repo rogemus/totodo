@@ -15,6 +15,7 @@ func Test_CreateTask(t *testing.T) {
 
 	task := model.Task{
 		Description: "test task",
+		ListId:      0,
 	}
 
 	testCases := []struct {
@@ -41,11 +42,17 @@ func Test_CreateTask(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 
+			query := `
+        INSERT INTO
+          tasks (description, status, listId)
+        VALUES ($1, $2, $3);`
+
 			mock.
-				ExpectExec("INSERT INTO tasks (description, status) VALUES ($1, $2);").
+				ExpectExec(query).
 				WithArgs(
 					test.task.Description,
 					test.task.Status,
+					test.task.ListId,
 				).
 				WillReturnResult(sqlmock.NewResult(test.taskId, 1))
 

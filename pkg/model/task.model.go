@@ -22,23 +22,22 @@ type Task struct {
 	Description string
 	Created     time.Time
 	Status      string
+	ListId      int
+	ListName    string
 }
 
-func NewTask(desc string) Task {
+func NewTask(desc string, listId int) Task {
 	created := time.Now()
 
 	return Task{
 		Description: desc,
 		Created:     created,
 		Status:      Status.TODO,
+		ListId:      listId,
 	}
 }
 
 func (t *Task) GetStatusIcon() string {
-	// if t.Status == Status.ACTIVE {
-	// 	return "★"
-	// }
-
 	if t.Status == Status.DONE {
 		return "✓"
 	}
