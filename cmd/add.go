@@ -69,7 +69,8 @@ func (cmd addCmd) Run(args []string) {
 		return
 	}
 
-	task := model.NewTask(*&addFlagValues.descFlag)
+  // TODO: addy dynaminc listId
+	task := model.NewTask(*&addFlagValues.descFlag, 1)
 	taskId, err := cmd.repo.CreateTask(task)
 
 	if err != nil {

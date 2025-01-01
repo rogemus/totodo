@@ -2,8 +2,22 @@ package repository
 
 import (
 	"database/sql"
+	_ "embed"
 	"errors"
 	"totodo/pkg/model"
+)
+
+var (
+	//go:embed queries/tasks/getTask.sql
+	getTaskQuery string
+	//go:embed queries/tasks/getTasks.sql
+	getTasksQuery string
+	//go:embed queries/tasks/updateTask.sql
+	updateTaskQuery string
+	//go:embed queries/tasks/deleteTask.sql
+	deleteTaskQuery string
+	//go:embed queries/tasks/createTask.sql
+	createTaskQuery string
 )
 
 type TasksRepository interface {
@@ -23,15 +37,16 @@ func NewTasksRepository(db *sql.DB) TasksRepository {
 }
 
 func (r *tasksRepository) GetTask(id int) (model.Task, error) {
-	query := "SELECT id, description, created, status FROM tasks WHERE id = $1;"
 	var task model.Task
 
-	row := r.db.QueryRow(query, id)
+	row := r.db.QueryRow(getTaskQuery, id)
 	err := row.Scan(
 		&task.Id,
 		&task.Description,
 		&task.Created,
 		&task.Status,
+		&task.ListId,
+		&task.ListName,
 	)
 
 	if err != nil {
@@ -42,8 +57,7 @@ func (r *tasksRepository) GetTask(id int) (model.Task, error) {
 }
 
 func (r *tasksRepository) GetTasks() ([]model.Task, error) {
-	query := "SELECT id, description, created, status FROM tasks;"
-	rows, err := r.db.Query(query)
+	rows, err := r.db.Query(getTasksQuery)
 
 	if err != nil {
 		return nil, err
@@ -60,6 +74,8 @@ func (r *tasksRepository) GetTasks() ([]model.Task, error) {
 			&task.Description,
 			&task.Created,
 			&task.Status,
+			&task.ListId,
+			&task.ListName,
 		)
 
 		if err != nil {
@@ -77,8 +93,7 @@ func (r *tasksRepository) GetTasks() ([]model.Task, error) {
 }
 
 func (r *tasksRepository) UpdateTask(task model.Task) error {
-	query := `UPDATE tasks SET description=? WHERE id = ?;`
-	_, err := r.db.Exec(query, task.Description, task.Id)
+	_, err := r.db.Exec(updateTaskQuery, task.Description, task.Id)
 
 	if err != nil {
 		return err
@@ -88,9 +103,7 @@ func (r *tasksRepository) UpdateTask(task model.Task) error {
 }
 
 func (r *tasksRepository) DeleteTask(id int) error {
-	query := "DELETE FROM tasks WHERE id = $1;"
-
-	_, err := r.db.Exec(query, id)
+	_, err := r.db.Exec(deleteTaskQuery, id)
 
 	if err != nil {
 		return err
@@ -100,13 +113,11 @@ func (r *tasksRepository) DeleteTask(id int) error {
 }
 
 func (r *tasksRepository) CreateTask(task model.Task) (int64, error) {
-	query := "INSERT INTO tasks (description, status) VALUES ($1, $2);"
-
 	if task.Description == "" {
 		return -1, errors.New("empty description")
 	}
 
-	result, err := r.db.Exec(query, task.Description, task.Status)
+	result, err := r.db.Exec(createTaskQuery, task.Description, task.Status, task.ListId)
 
 	if err != nil {
 		return -1, err

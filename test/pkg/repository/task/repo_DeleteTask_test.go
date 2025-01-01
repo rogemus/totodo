@@ -33,8 +33,14 @@ func Test_DeleteTask(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 
+			query := `
+        DELETE FROM
+          tasks AS t
+        WHERE
+          t.id = $1;
+      `
 			mock.
-				ExpectExec("DELETE FROM tasks WHERE id = $1;").
+				ExpectExec(query).
 				WithArgs(test.taskId).
 				WillReturnResult(sqlmock.NewResult(int64(test.taskId), 1)).
 				WillReturnError(test.expectedSqlErr)
