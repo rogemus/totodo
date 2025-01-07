@@ -14,6 +14,7 @@ import (
 type projectsListViewModel struct {
 	list    list.Model
 	project model.Project
+	repo    repository.ProjectsRepository
 }
 
 func NewProjectsListViewModel(repo repository.ProjectsRepository) projectsListViewModel {
@@ -22,6 +23,7 @@ func NewProjectsListViewModel(repo repository.ProjectsRepository) projectsListVi
 
 	m := projectsListViewModel{
 		list: list.New(items, list.NewDefaultDelegate(), 0, 0),
+		repo: repo,
 	}
 
 	return m
@@ -40,6 +42,13 @@ func (m projectsListViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		h, v := ui.WrapperStyle.GetFrameSize()
 		m.list.SetSize(msg.Width-h, msg.Height-v)
+
+	case tui.ChangeViewMsg:
+		projects, _ := m.repo.GetProjects()
+		items := utils.ConvertToListitem(projects)
+
+		m.list.SetItems(items)
+		return m, nil
 
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {

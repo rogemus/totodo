@@ -21,10 +21,7 @@ type TUIModel struct {
 	selectedView tui.TuiView
 }
 
-func NewTui(
-	projectsRepo repository.ProjectsRepository,
-	tasksRepo repository.TasksRepository,
-) TUIModel {
+func NewTui(projectsRepo repository.ProjectsRepository, tasksRepo repository.TasksRepository) TUIModel {
 	return TUIModel{
 		projectsListModel:  views.NewProjectsListViewModel(projectsRepo),
 		createProjectModel: views.NewCreateProjectViewModel(projectsRepo),
@@ -37,9 +34,7 @@ func NewTui(
 	}
 }
 
-func (m TUIModel) Init() tea.Cmd {
-	return nil
-}
+func (m TUIModel) Init() tea.Cmd { return nil }
 
 func (m TUIModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd

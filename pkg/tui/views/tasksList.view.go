@@ -21,7 +21,7 @@ type tasksListViewModel struct {
 func NewTasksListViewModel(repo repository.TasksRepository) tasksListViewModel {
 	m := tasksListViewModel{
 		repo: repo,
-		list: list.New([]list.Item{}, list.NewDefaultDelegate(), 25, 25),
+		list: list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0),
 	}
 
 	return m
@@ -48,7 +48,6 @@ func (m tasksListViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		m.list.Title = fmt.Sprintf("@%s", project.Name)
 		m.list.SetItems(items)
-
 		return m, nil
 
 	case tea.KeyMsg:
@@ -66,8 +65,8 @@ func (m tasksListViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			return m, tea.Batch(tui.NewChangeViewCmd(tui.DELETE_TASK_VIEW), tea.WindowSize())
 		}
-
 	}
 
+	m.list, cmd = m.list.Update(msg)
 	return m, cmd
 }
