@@ -32,7 +32,7 @@ func Test_CreateTask(t *testing.T) {
 		},
 		{
 			name:        "error if empty task",
-			expectedErr: errors.New("empty description"),
+			expectedErr: errors.New("empty name"),
 			taskId:      -1,
 			task:        empty_task,
 		},
