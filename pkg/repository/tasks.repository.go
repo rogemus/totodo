@@ -114,7 +114,7 @@ func (r *tasksRepository) DeleteTask(id int) error {
 
 func (r *tasksRepository) CreateTask(task model.Task) (int64, error) {
 	if task.Name == "" {
-		return -1, errors.New("empty description")
+		return -1, errors.New("empty name")
 	}
 
 	result, err := r.db.Exec(createTaskQuery, task.Name, task.Status, task.ProjectId)

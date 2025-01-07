@@ -48,12 +48,11 @@ func (m tasksListViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		m.list.Title = fmt.Sprintf("@%s", project.Name)
 		m.list.SetItems(items)
-		return m, nil
 
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {
 
-		case "A":
+		case "a":
 			return m, tea.Batch(tui.NewChangeViewCmd(tui.CREATE_TASK_VIEW), tea.WindowSize())
 
 		case "X":

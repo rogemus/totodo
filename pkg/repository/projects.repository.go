@@ -25,7 +25,7 @@ type ProjectsRepository interface {
 	GetProjects() ([]model.Project, error)
 	UpdateProject(list model.Project) error
 	DeleteProject(id int) error
-	CreateProject(list model.Project) (int64, error)
+	CreateProject(project model.Project) (int64, error)
 }
 
 type projectsRepository struct {

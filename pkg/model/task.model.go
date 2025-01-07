@@ -26,14 +26,14 @@ type Task struct {
 	ProjectName string
 }
 
-func NewTask(desc string, listId int) Task {
+func NewTask(name string, projectId int) Task {
 	created := time.Now()
 
 	return Task{
-		Name:      desc,
+		Name:      name,
 		Created:   created,
 		Status:    Status.TODO,
-		ProjectId: listId,
+		ProjectId: projectId,
 	}
 }
 

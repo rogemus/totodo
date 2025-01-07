@@ -48,7 +48,6 @@ func (m projectsListViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		items := utils.ConvertToListitem(projects)
 
 		m.list.SetItems(items)
-		return m, nil
 
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {
@@ -62,7 +61,7 @@ func (m projectsListViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			return m, tea.Batch(tui.NewChangeViewCmd(tui.TASKS_LIST_VIEW), tea.WindowSize())
 
-		case "A":
+		case "a":
 			return m, tea.Batch(tui.NewChangeViewCmd(tui.CREATE_PROJECT_VIEW), tea.WindowSize())
 
 		case "X":

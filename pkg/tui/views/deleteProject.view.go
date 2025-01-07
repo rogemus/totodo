@@ -9,24 +9,17 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type prjDelfocus int
-
-const (
-	PRJ_DEL_CANCEL_BTN prjDelfocus = iota
-	PRJ_DEL_CONFIRM_BTN
-)
-
 type deleteProjectViewModel struct {
+	focus        tui.Focus
 	repo         repository.ProjectsRepository
 	windowHeight int
 	windowWidth  int
-	focus        prjDelfocus
 }
 
 func NewDeleteProjectViewModel(repo repository.ProjectsRepository) deleteProjectViewModel {
 	return deleteProjectViewModel{
+		focus: tui.CONFIRM_BTN,
 		repo:  repo,
-		focus: PRJ_DEL_CONFIRM_BTN,
 	}
 }
 
@@ -36,13 +29,13 @@ func (m deleteProjectViewModel) View() string {
 	cancelBtn := ui.CancelBtnStyle
 	confirmBtn := ui.ConfirmBtnStyle
 
-	if m.focus == PRJ_DEL_CANCEL_BTN {
+	if m.focus == tui.CANCEL_BTN {
 		cancelBtn = cancelBtn.Background(ui.BrightColors.Red).Bold(true)
 	} else {
 		cancelBtn = cancelBtn.Background(ui.NormalColors.Red).Bold(false)
 	}
 
-	if m.focus == PRJ_DEL_CONFIRM_BTN {
+	if m.focus == tui.CONFIRM_BTN {
 		confirmBtn = confirmBtn.Background(ui.BrightColors.Green).Bold(true)
 	} else {
 		confirmBtn = confirmBtn.Background(ui.NormalColors.Green).Bold(false)
@@ -82,7 +75,7 @@ func (m deleteProjectViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.windowHeight = msg.Height - v
 
 	case tui.ChangeViewMsg:
-		m.focus = PRJ_DEL_CONFIRM_BTN
+		m.focus = tui.CONFIRM_BTN
 		return m, nil
 
 	case tea.KeyMsg:
@@ -90,14 +83,14 @@ func (m deleteProjectViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "tab":
 			switch m.focus {
-			case PRJ_DEL_CONFIRM_BTN:
-				m.focus = PRJ_DEL_CANCEL_BTN
-			case PRJ_DEL_CANCEL_BTN:
-				m.focus = PRJ_DEL_CONFIRM_BTN
+			case tui.CONFIRM_BTN:
+				m.focus = tui.CANCEL_BTN
+			case tui.CANCEL_BTN:
+				m.focus = tui.CONFIRM_BTN
 			}
 
 		case "enter":
-			if m.focus == PRJ_DEL_CONFIRM_BTN {
+			if m.focus == tui.CONFIRM_BTN {
 				project := tui.State.SelectedProject
 				m.repo.DeleteProject(project.Id)
 

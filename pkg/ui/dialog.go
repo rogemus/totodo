@@ -8,7 +8,8 @@ var DialogTitleStyle = lipgloss.NewStyle().
 
 var DialogBoxStyle = lipgloss.NewStyle().
 	Padding(1).
-	Border(lipgloss.RoundedBorder())
+	Border(lipgloss.RoundedBorder()).
+	Width(50)
 
 var DialogTextStyle = lipgloss.NewStyle()
 
@@ -20,9 +21,9 @@ var ButtonStyle = lipgloss.NewStyle().
 
 var ConfirmBtnStyle = ButtonStyle.
 	Foreground(NormalColors.White).
-	// Background(NormalColors.Green).
+	Background(NormalColors.Green).
 	MarginLeft(2)
 
 var CancelBtnStyle = ButtonStyle.
-	Foreground(NormalColors.White)
-	// Background(NormalColors.Red)
+	Foreground(NormalColors.White).
+	Background(NormalColors.Red)
