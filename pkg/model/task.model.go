@@ -19,27 +19,39 @@ var Status TaskStatus = TaskStatus{
 
 type Task struct {
 	Id          int
-	Description string
+	Name        string
 	Created     time.Time
 	Status      string
-	ProjectId      int
-	ProjectName    string
+	ProjectId   int
+	ProjectName string
 }
 
 func NewTask(desc string, listId int) Task {
 	created := time.Now()
 
 	return Task{
-		Description: desc,
-		Created:     created,
-		Status:      Status.TODO,
-		ProjectId:      listId,
+		Name:      desc,
+		Created:   created,
+		Status:    Status.TODO,
+		ProjectId: listId,
 	}
+}
+
+func (t Task) FilterValue() string {
+	return t.Name
+}
+
+func (t Task) Title() string {
+	return t.Name
+}
+
+func (t Task) Description() string {
+	return ""
 }
 
 func (t *Task) GetListEntry() string {
 	id := fmt.Sprintf("[dim]%d[-]", t.Id)
-	description := fmt.Sprintf("[cyan]%s[-]", t.Description)
+	description := fmt.Sprintf("[cyan]%s[-]", t.Name)
 	created := t.GetEntryCreation()
 	entry := fmt.Sprintf("%s %s %s", id, description, created)
 	return entry

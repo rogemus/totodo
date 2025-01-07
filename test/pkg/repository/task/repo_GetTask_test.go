@@ -16,10 +16,10 @@ func Test_GetTask(t *testing.T) {
 	var empty_task model.Task
 	createdDate, _ := time.Parse("2006-01-02 15:04:05", "2024-09-08 19:15:17")
 	task := model.Task{
-		Id:          1,
-		Description: "test task",
-		Created:     createdDate,
-		Status:      "todo",
+		Id:      1,
+		Name:    "test task",
+		Created: createdDate,
+		Status:  "todo",
 	}
 
 	testCases := []struct {
@@ -46,7 +46,7 @@ func Test_GetTask(t *testing.T) {
 
 			columns := []string{
 				"id",
-				"description",
+				"name",
 				"created",
 				"status",
 				"projectId",
@@ -58,7 +58,7 @@ func Test_GetTask(t *testing.T) {
 				expectedRows.
 					AddRow(
 						test.expected.Id,
-						test.expected.Description,
+						test.expected.Name,
 						test.expected.Created,
 						test.expected.Status,
 						test.expected.ProjectId,
@@ -69,7 +69,7 @@ func Test_GetTask(t *testing.T) {
 			query := `
         SELECT
           t.id,
-          t.description,
+          t.name,
           t.created,
           t.status,
           t.projectId,

@@ -15,7 +15,7 @@ func Test_GetTasks(t *testing.T) {
 	createdDate, _ := time.Parse("2006-01-02 15:04:05", "2024-09-08 19:15:17")
 	task_1 := model.Task{
 		Id:          1,
-		Description: "test task",
+		Name:        "test task",
 		Created:     createdDate,
 		Status:      "todo",
 		ProjectId:   1,
@@ -23,7 +23,7 @@ func Test_GetTasks(t *testing.T) {
 	}
 	task_2 := model.Task{
 		Id:          2,
-		Description: "test task 2",
+		Name:        "test task 2",
 		Created:     createdDate,
 		Status:      "todo",
 		ProjectId:   1,
@@ -55,7 +55,7 @@ func Test_GetTasks(t *testing.T) {
 
 			columns := []string{
 				"id",
-				"description",
+				"name",
 				"created",
 				"status",
 				"projectId",
@@ -66,7 +66,7 @@ func Test_GetTasks(t *testing.T) {
 			for _, task := range test.expected {
 				expectedRows.AddRow(
 					task.Id,
-					task.Description,
+					task.Name,
 					task.Created,
 					task.Status,
 					task.ProjectId,
@@ -77,7 +77,7 @@ func Test_GetTasks(t *testing.T) {
 			query := `
         SELECT
           t.id,
-          t.description,
+          t.name,
           t.created,
           t.status,
           t.projectId,
@@ -86,19 +86,21 @@ func Test_GetTasks(t *testing.T) {
           tasks AS t LEFT OUTER JOIN projects as p
         ON
           t.projectId = p.id
+        WHERE
+          p.id = $1
         ORDER BY
           t.created
         DESC;`
 
 			mock.
 				ExpectQuery(query).
-				WithoutArgs().
+				WithArgs(0).
 				WillReturnRows(expectedRows)
 
 			defer db.Close()
 
 			repo := repository.NewTasksRepository(db)
-			result, getErr := repo.GetTasks()
+			result, getErr := repo.GetTasks(0)
 			sqlErr := mock.ExpectationsWereMet()
 
 			assert.Equal(t, sqlErr, nil)

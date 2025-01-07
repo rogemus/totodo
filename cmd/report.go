@@ -108,7 +108,7 @@ func (cmd reportCmd) listReport() {
 		ListTitleStyles = CellStyle.Foreground(ui.NormalColors.Cyan)
 	)
 
-	tasks, _ := cmd.repo.GetTasks()
+	tasks, _ := cmd.repo.GetTasks(1)
 	activeTasks, todoTasks, doneTasks := GroupByStatus(tasks)
 
 	t := table.New().Border(lipgloss.HiddenBorder())
@@ -118,7 +118,7 @@ func (cmd reportCmd) listReport() {
 		statusIcon := task.GetStatusIcon()
 		createdCol := CreatedStyle.Render(task.GetTimeSinceCreation())
 		statusCol := TodoStatusStyles.Render(statusIcon)
-		titleCol := fmt.Sprintf("%s%s", ActiveTitleStyles.Render(task.Description), ActiveStatusStyles.Render("★"))
+		titleCol := fmt.Sprintf("%s%s", ActiveTitleStyles.Render(task.Name), ActiveStatusStyles.Render("★"))
 		listCol := ListTitleStyles.Render(fmt.Sprintf("@%s", task.ProjectName))
 
 		t.Row(idCol, statusCol, titleCol, createdCol, listCol)
@@ -131,7 +131,7 @@ func (cmd reportCmd) listReport() {
 		statusIcon := task.GetStatusIcon()
 		createdCol := CreatedStyle.Render(task.GetTimeSinceCreation())
 		statusCol := TodoStatusStyles.Render(statusIcon)
-		titleCol := TodoTitleStyles.Render(task.Description)
+		titleCol := TodoTitleStyles.Render(task.Name)
 		listCol := ListTitleStyles.Render(fmt.Sprintf("@%s", task.ProjectName))
 
 		t.Row(idCol, statusCol, titleCol, createdCol, listCol)
@@ -142,7 +142,7 @@ func (cmd reportCmd) listReport() {
 		statusIcon := task.GetStatusIcon()
 		createdCol := CreatedStyle.Render(task.GetTimeSinceCreation())
 		statusCol := DoneStatusStyles.Render(statusIcon)
-		titleCol := DoneTitleStyles.Render(task.Description)
+		titleCol := DoneTitleStyles.Render(task.Name)
 		listCol := ListTitleStyles.Render(fmt.Sprintf("@%s", task.ProjectName))
 
 		t.Row(idCol, statusCol, titleCol, createdCol, listCol)

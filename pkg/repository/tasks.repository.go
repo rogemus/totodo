@@ -22,7 +22,7 @@ var (
 
 type TasksRepository interface {
 	GetTask(id int) (model.Task, error)
-	GetTasks() ([]model.Task, error)
+	GetTasks(projectId int) ([]model.Task, error)
 	UpdateTask(task model.Task) error
 	DeleteTask(id int) error
 	CreateTask(task model.Task) (int64, error)
@@ -42,7 +42,7 @@ func (r *tasksRepository) GetTask(id int) (model.Task, error) {
 	row := r.db.QueryRow(getTaskQuery, id)
 	err := row.Scan(
 		&task.Id,
-		&task.Description,
+		&task.Name,
 		&task.Created,
 		&task.Status,
 		&task.ProjectId,
@@ -56,8 +56,8 @@ func (r *tasksRepository) GetTask(id int) (model.Task, error) {
 	return task, nil
 }
 
-func (r *tasksRepository) GetTasks() ([]model.Task, error) {
-	rows, err := r.db.Query(getTasksQuery)
+func (r *tasksRepository) GetTasks(projectId int) ([]model.Task, error) {
+	rows, err := r.db.Query(getTasksQuery, projectId)
 
 	if err != nil {
 		return nil, err
@@ -71,7 +71,7 @@ func (r *tasksRepository) GetTasks() ([]model.Task, error) {
 
 		err := rows.Scan(
 			&task.Id,
-			&task.Description,
+			&task.Name,
 			&task.Created,
 			&task.Status,
 			&task.ProjectId,
@@ -93,7 +93,7 @@ func (r *tasksRepository) GetTasks() ([]model.Task, error) {
 }
 
 func (r *tasksRepository) UpdateTask(task model.Task) error {
-	_, err := r.db.Exec(updateTaskQuery, task.Description, task.Id)
+	_, err := r.db.Exec(updateTaskQuery, task.Name, task.Id)
 
 	if err != nil {
 		return err
@@ -113,11 +113,11 @@ func (r *tasksRepository) DeleteTask(id int) error {
 }
 
 func (r *tasksRepository) CreateTask(task model.Task) (int64, error) {
-	if task.Description == "" {
+	if task.Name == "" {
 		return -1, errors.New("empty description")
 	}
 
-	result, err := r.db.Exec(createTaskQuery, task.Description, task.Status, task.ProjectId)
+	result, err := r.db.Exec(createTaskQuery, task.Name, task.Status, task.ProjectId)
 
 	if err != nil {
 		return -1, err

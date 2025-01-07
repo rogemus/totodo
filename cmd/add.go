@@ -78,7 +78,7 @@ func (cmd addCmd) Run(args []string) {
 		return
 	}
 
-	fmt.Printf("Task Created: [%d] (@%s) %s", taskId, task.Created.Format(time.DateTime), task.Description)
+	fmt.Printf("Task Created: [%d] (@%s) %s", taskId, task.Created.Format(time.DateTime), task.Name)
 }
 
 func (cmd addCmd) Help() {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"totodo/pkg/repository"
+	"totodo/pkg/tui"
 	"totodo/pkg/tui/views"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -56,10 +57,15 @@ func (m TUIModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
+	case tui.ChangeToTasksListViewMsg:
+		m.selectedView = TASKS_LIST_VIEW
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
 			return m, tea.Quit
+
+			// TODO: Mode to proper views
 		case "a":
 			m.selectedView = CREATE_TASK_VIEW
 

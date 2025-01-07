@@ -18,3 +18,7 @@ func NewProject(name string) Project {
 		Created: created,
 	}
 }
+
+func (p Project) FilterValue() string {
+	return p.Name
+}

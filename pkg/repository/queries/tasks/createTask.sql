@@ -1,3 +1,3 @@
 INSERT INTO
-  tasks (description, status, projectId)
+  tasks (name, status, projectId)
 VALUES ($1, $2, $3);

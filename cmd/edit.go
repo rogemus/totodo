@@ -87,7 +87,7 @@ func (cmd editCmd) Run(args []string) {
 		return
 	}
 
-	task.Description = *&editFlagValues.descFlag
+	task.Name = *&editFlagValues.descFlag
 	err = cmd.repo.UpdateTask(task)
 
 	if err != nil {
@@ -95,7 +95,7 @@ func (cmd editCmd) Run(args []string) {
 		return
 	}
 
-	fmt.Printf("Task Updated: [%d] (@%s) %s", task.Id, task.Created.Format(time.DateTime), task.Description)
+	fmt.Printf("Task Updated: [%d] (@%s) %s", task.Id, task.Created.Format(time.DateTime), task.Name)
 }
 
 func (cmd editCmd) Help() {

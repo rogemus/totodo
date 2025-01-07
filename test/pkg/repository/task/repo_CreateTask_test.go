@@ -14,8 +14,8 @@ func Test_CreateTask(t *testing.T) {
 	var empty_task model.Task
 
 	task := model.Task{
-		Description: "test task",
-		ProjectId:      0,
+		Name:      "test task",
+		ProjectId: 0,
 	}
 
 	testCases := []struct {
@@ -44,13 +44,13 @@ func Test_CreateTask(t *testing.T) {
 
 			query := `
         INSERT INTO
-          tasks (description, status, projectId)
+          tasks (name, status, projectId)
         VALUES ($1, $2, $3);`
 
 			mock.
 				ExpectExec(query).
 				WithArgs(
-					test.task.Description,
+					test.task.Name,
 					test.task.Status,
 					test.task.ProjectId,
 				).

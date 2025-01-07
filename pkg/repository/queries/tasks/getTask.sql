@@ -1,6 +1,6 @@
 SELECT
   t.id,
-  t.description,
+  t.name,
   t.created,
   t.status,
   t.projectId,

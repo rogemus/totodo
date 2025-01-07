@@ -11,12 +11,12 @@ import (
 
 func Test_UpdateTask(t *testing.T) {
 	task_original := model.Task{
-		Id:          1,
-		Description: "test task",
+		Id:   1,
+		Name: "test task",
 	}
 	task_updated := model.Task{
-		Id:          1,
-		Description: "udpated",
+		Id:   1,
+		Name: "udpated",
 	}
 	testCases := []struct {
 		name           string
@@ -42,13 +42,13 @@ func Test_UpdateTask(t *testing.T) {
         UPDATE 
           tasks AS t
         SET
-          t.description = $2
+          t.name = $2
         WHERE
           t.id = $1;
       `
 			mock.
 				ExpectExec(query).
-				WithArgs(test.updatedTask.Description, test.originalTask.Id).
+				WithArgs(test.updatedTask.Name, test.originalTask.Id).
 				WillReturnResult(sqlmock.NewResult(1, 1)).
 				WillReturnError(test.expectedSqlErr)
 
