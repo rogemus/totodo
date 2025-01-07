@@ -11,9 +11,7 @@ func NewDeleteTaskViewModel(repo repository.TasksRepository) deleteTaskViewModel
 	return deleteTaskViewModel{}
 }
 
-func (m deleteTaskViewModel) Init() tea.Cmd {
-	return nil
-}
+func (m deleteTaskViewModel) Init() tea.Cmd { return nil }
 
 func (m deleteTaskViewModel) View() string {
 	return "deleteTaskViewModel"

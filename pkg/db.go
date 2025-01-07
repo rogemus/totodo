@@ -43,9 +43,9 @@ func NewDB(dbFile string) (*sql.DB, error) {
 		return nil, err
 	}
 
-	if _, err := db.Exec(createDb); err != nil {
-		return nil, err
-	}
+	// if _, err := db.Exec(createDb); err != nil {
+	// 	return nil, err
+	// }
 
 	return db, nil
 }

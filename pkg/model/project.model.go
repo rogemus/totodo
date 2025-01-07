@@ -19,6 +19,14 @@ func NewProject(name string) Project {
 	}
 }
 
+func (p Project) Title() string {
+	return p.Name
+}
+
+func (p Project) Description() string {
+	return ""
+}
+
 func (p Project) FilterValue() string {
 	return p.Name
 }

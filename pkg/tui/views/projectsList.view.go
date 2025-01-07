@@ -1,12 +1,10 @@
 package views
 
 import (
-	"fmt"
-	"io"
-	"strings"
 	"totodo/pkg/model"
 	"totodo/pkg/repository"
 	"totodo/pkg/tui"
+	"totodo/pkg/utils"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -20,64 +18,18 @@ type projectsListViewModel struct {
 	project model.Project
 }
 
-var (
-	titleStyle        = lipgloss.NewStyle().MarginLeft(2)
-	itemStyle         = lipgloss.NewStyle().PaddingLeft(4)
-	selectedItemStyle = lipgloss.NewStyle().PaddingLeft(2).Foreground(lipgloss.Color("170"))
-	paginationStyle   = list.DefaultStyles().PaginationStyle.PaddingLeft(4)
-	helpStyle         = list.DefaultStyles().HelpStyle.PaddingLeft(4).PaddingBottom(1)
-	quitTextStyle     = lipgloss.NewStyle().Margin(1, 0, 2, 4)
-)
-
-type itemDelegate struct{}
-
-func (d itemDelegate) Height() int {
-	return 1
-}
-
-func (d itemDelegate) Spacing() int {
-	return 0
-}
-
-func (d itemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd {
-	return nil
-}
-
-func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
-	project, ok := listItem.(model.Project)
-
-	if !ok {
-		return
-	}
-
-	str := fmt.Sprintf("%d. [%d] %s", index+1, project.Id, project.Name)
-
-	fn := itemStyle.Render
-	if index == m.Index() {
-		fn = func(s ...string) string {
-			return selectedItemStyle.Render("> " + strings.Join(s, " "))
-		}
-	}
-
-	fmt.Fprint(w, fn(str))
-}
-
-func NewProjectsListViewModel(listRepo repository.ProjectsRepository) projectsListViewModel {
-	projects := []list.Item{
-		model.Project{Name: "Project 1"},
-		model.Project{Name: "Project 2"},
-	}
+func NewProjectsListViewModel(repo repository.ProjectsRepository) projectsListViewModel {
+	projects, _ := repo.GetProjects()
+	items := utils.ConvertToListitem(projects)
 
 	m := projectsListViewModel{
-		list: list.New(projects, itemDelegate{}, 0, 0),
+		list: list.New(items, list.NewDefaultDelegate(), 0, 0),
 	}
 
 	return m
 }
 
-func (m projectsListViewModel) Init() tea.Cmd {
-	return nil
-}
+func (m projectsListViewModel) Init() tea.Cmd { return nil }
 
 func (m projectsListViewModel) View() string {
 	return m.list.View()
@@ -102,7 +54,7 @@ func (m projectsListViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			cmd = tui.NewChangeToTaskListViewCmd(project)
-			return m, cmd
+			return m, tea.Batch(cmd, tea.WindowSize())
 		}
 	}
 

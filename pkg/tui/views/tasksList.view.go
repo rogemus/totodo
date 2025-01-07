@@ -1,9 +1,10 @@
 package views
 
 import (
-	"totodo/pkg/model"
+	"fmt"
 	"totodo/pkg/repository"
 	"totodo/pkg/tui"
+	"totodo/pkg/utils"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -18,20 +19,16 @@ type tasksListViewModel struct {
 func NewTasksListViewModel(repo repository.TasksRepository) tasksListViewModel {
 	m := tasksListViewModel{
 		repo: repo,
-		list: list.New([]list.Item{
-			model.Task{Name: "Task 1"},
-		}, list.NewDefaultDelegate(), 10, 10),
+		list: list.New([]list.Item{}, list.NewDefaultDelegate(), 25, 25),
 	}
 
 	return m
 }
 
-func (m tasksListViewModel) Init() tea.Cmd {
-	return nil
-}
+func (m tasksListViewModel) Init() tea.Cmd { return nil }
 
 func (m tasksListViewModel) View() string {
-	return m.list.View()
+	return docStyle.Render(m.list.View())
 }
 
 func (m tasksListViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -43,21 +40,15 @@ func (m tasksListViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.list.SetSize(msg.Width-h, msg.Height-v)
 
 	case tui.ChangeToTasksListViewMsg:
-		tasks, _ := m.repo.GetTasks(tui.State.SelectedTask.Id)
-		m.list.SetItems(convertToListitem(tasks))
+		project := tui.State.SelectedProject
+		tasks, _ := m.repo.GetTasks(project.Id)
+		items := utils.ConvertToListitem(tasks)
+
+		m.list.Title = fmt.Sprintf("@%s", project.Name)
+		m.list.SetItems(items)
 
 		return m, nil
 	}
 
 	return m, cmd
-}
-
-func convertToListitem(tasks []model.Task) []list.Item {
-	var items []list.Item
-
-	for _, t := range tasks {
-		items = append(items, list.Item(t))
-	}
-
-	return items
 }

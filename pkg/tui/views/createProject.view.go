@@ -11,9 +11,7 @@ func NewCreateProjectViewModel(listRepo repository.ProjectsRepository) createPro
 	return createProjectViewModel{}
 }
 
-func (m createProjectViewModel) Init() tea.Cmd {
-	return nil
-}
+func (m createProjectViewModel) Init() tea.Cmd { return nil }
 
 func (m createProjectViewModel) View() string {
 	return "createProjectViewModel"

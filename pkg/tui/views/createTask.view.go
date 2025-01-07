@@ -11,9 +11,7 @@ func NewCreateTaskViewModel(repo repository.TasksRepository) createTaskViewModel
 	return createTaskViewModel{}
 }
 
-func (m createTaskViewModel) Init() tea.Cmd {
-	return nil
-}
+func (m createTaskViewModel) Init() tea.Cmd { return nil }
 
 func (m createTaskViewModel) View() string {
 	return "createTaskViewModel"
@@ -23,4 +21,3 @@ func (m createTaskViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	return m, cmd
 }
-
