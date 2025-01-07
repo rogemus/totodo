@@ -1,17 +1,13 @@
 package tui
 
 import (
-	"fmt"
-	"totodo/pkg/model"
-
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type ChangeToTasksListViewMsg string
+type ChangeViewMsg int
 
-func NewChangeToTaskListViewCmd(project model.Project) tea.Cmd {
-	projectId := fmt.Sprintf("%d", project.Id)
+func NewChangeViewCmd(view TuiView) tea.Cmd {
 	return func() tea.Msg {
-		return ChangeToTasksListViewMsg(projectId)
+		return ChangeViewMsg(view)
 	}
 }
