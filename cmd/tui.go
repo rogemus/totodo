@@ -1,90 +1,107 @@
 package cmd
 
 import (
-	"github.com/gdamore/tcell/v2"
-	"github.com/rivo/tview"
+	"fmt"
+	"os"
+	"totodo/pkg/repository"
+	"totodo/pkg/tui"
+	"totodo/pkg/tui/views"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
-var app = tview.NewApplication()
+type TUIModel struct {
+	projectsListModel  tea.Model
+	createProjectModel tea.Model
+	deleteProjectModel tea.Model
+	tasksListModel     tea.Model
+	createTaskModel    tea.Model
+	deleteTaskModel    tea.Model
 
-func main() {
+	selectedView tui.TuiView
+}
 
-	//
-	// root := tview.NewFlex().SetDirection(tview.FlexRow).
-	// 	AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
-	// 			AddItem(tview.NewBox().SetBorder(true).SetTitle("Content"), 0, 1, false).
-	//    ).AddItem(tview.NewTextView().SetText("help"), 1, 1, false)
+func NewTui(projectsRepo repository.ProjectsRepository, tasksRepo repository.TasksRepository) TUIModel {
+	return TUIModel{
+		projectsListModel:  views.NewProjectsListViewModel(projectsRepo),
+		createProjectModel: views.NewCreateProjectViewModel(projectsRepo),
+		deleteProjectModel: views.NewDeleteProjectViewModel(projectsRepo),
+		tasksListModel:     views.NewTasksListViewModel(tasksRepo),
+		createTaskModel:    views.NewCreateTaskViewModel(tasksRepo),
+		deleteTaskModel:    views.NewDeleteTaskViewModel(tasksRepo),
 
-	// TODO left to render list
-	// TODO right to render details
-	// TODO render modal
+		selectedView: tui.PROJECTS_LIST_VIEW,
+	}
+}
 
-	modal := func(p tview.Primitive, width, height int) tview.Primitive {
-		return tview.NewFlex().
-			AddItem(nil, 0, 1, false).
-			AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-				AddItem(nil, 0, 1, false).
-				AddItem(p, height, 1, true).
-				AddItem(nil, 0, 1, false), width, 1, true).
-			AddItem(nil, 0, 1, false)
+func (m TUIModel) Init() tea.Cmd { return nil }
+
+func (m TUIModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd
+
+	switch msg := msg.(type) {
+	case tui.ChangeViewMsg:
+		m.selectedView = tui.TuiView(msg)
+
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "ctrl+c", "q":
+			return m, tea.Quit
+		}
 	}
 
-	list := tview.NewList().
-		AddItem("List item 1", "Some explanatory text", 'a', nil).
-		AddItem("List item 2", "Some explanatory text", 'b', nil).
-		AddItem("List item 3", "Some explanatory text", 'c', nil).
-		AddItem("List item 4", "Some explanatory text", 'd', nil)
-	// AddItem("Quit", "Press to exit", 'q', func() {
-	// 	app.Stop()
-	// })
+	switch m.selectedView {
+	case tui.PROJECTS_LIST_VIEW:
+		m.projectsListModel, cmd = m.projectsListModel.Update(msg)
 
-	detailsVisible := false
-	modalVisible := false
+	case tui.CREATE_PROJECT_VIEW:
+		m.createProjectModel, cmd = m.createProjectModel.Update(msg)
 
-	twoCols := tview.NewFlex().SetDirection(tview.FlexRow).
-		AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
-			AddItem(list, 0, 2, true).
-			AddItem(tview.NewBox().SetBorder(true).SetTitle("Right"), 0, 1, false), 0, 1, true).
-		AddItem(tview.NewTextView().SetText("help"), 1, 1, false)
+	case tui.DELETE_PROJECT_VIEW:
+		m.deleteProjectModel, cmd = m.deleteProjectModel.Update(msg)
 
-	oneCols := tview.NewFlex().SetDirection(tview.FlexRow).
-		AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
-			AddItem(list, 0, 1, true), 0, 1, true).
-		AddItem(tview.NewTextView().SetText("help"), 1, 1, false)
+	case tui.TASKS_LIST_VIEW:
+		m.tasksListModel, cmd = m.tasksListModel.Update(msg)
 
-	box := tview.NewBox().
-		SetBorder(true).
-		SetTitle("Centered Box")
+	case tui.CREATE_TASK_VIEW:
+		m.createTaskModel, cmd = m.createTaskModel.Update(msg)
 
-	pages := tview.NewPages().
-		AddPage("oneCols", oneCols, true, true).
-		AddPage("twoCols", twoCols, true, false).
-		AddPage("modal", modal(box, 40, 10), true, false)
+	case tui.DELETE_TASK_VIEW:
+		m.deleteTaskModel, cmd = m.deleteTaskModel.Update(msg)
+	}
 
-	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		switch event.Rune() {
-		case 113: // q
-			app.Stop()
-		case 112: // p
-			if detailsVisible == true {
-				pages.SwitchToPage("oneCols")
-			} else {
-				pages.SwitchToPage("twoCols")
-			}
-			detailsVisible = !detailsVisible
-		case 97: // a
-			if modalVisible {
-				pages.HidePage("modal")
-			} else {
-				pages.ShowPage("modal")
-			}
-			modalVisible = !modalVisible
-		}
+	return m, cmd
+}
 
-		return event
-	})
+func (m TUIModel) View() string {
+	switch m.selectedView {
+	case tui.PROJECTS_LIST_VIEW:
+		return m.projectsListModel.View()
 
-	if err := app.SetRoot(pages, true).EnableMouse(true).Run(); err != nil {
-		panic(err)
+	case tui.CREATE_PROJECT_VIEW:
+		return m.createProjectModel.View()
+
+	case tui.DELETE_PROJECT_VIEW:
+		return m.deleteProjectModel.View()
+
+	case tui.TASKS_LIST_VIEW:
+		return m.tasksListModel.View()
+
+	case tui.CREATE_TASK_VIEW:
+		return m.createTaskModel.View()
+
+	case tui.DELETE_TASK_VIEW:
+		return m.deleteTaskModel.View()
+	}
+
+	return m.createProjectModel.View()
+}
+
+func (m TUIModel) Run() {
+	p := tea.NewProgram(&m, tea.WithAltScreen())
+
+	if _, err := p.Run(); err != nil {
+		fmt.Println("Ups ...")
+		os.Exit(1)
 	}
 }

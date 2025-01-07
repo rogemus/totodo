@@ -16,10 +16,10 @@ func Test_GetTask(t *testing.T) {
 	var empty_task model.Task
 	createdDate, _ := time.Parse("2006-01-02 15:04:05", "2024-09-08 19:15:17")
 	task := model.Task{
-		Id:          1,
-		Description: "test task",
-		Created:     createdDate,
-		Status:      "todo",
+		Id:      1,
+		Name:    "test task",
+		Created: createdDate,
+		Status:  "todo",
 	}
 
 	testCases := []struct {
@@ -46,11 +46,11 @@ func Test_GetTask(t *testing.T) {
 
 			columns := []string{
 				"id",
-				"description",
+				"name",
 				"created",
 				"status",
-				"listId",
-				"listName",
+				"projectId",
+				"projectName",
 			}
 			expectedRows := sqlmock.NewRows(columns)
 
@@ -58,26 +58,26 @@ func Test_GetTask(t *testing.T) {
 				expectedRows.
 					AddRow(
 						test.expected.Id,
-						test.expected.Description,
+						test.expected.Name,
 						test.expected.Created,
 						test.expected.Status,
-						test.expected.ListId,
-						test.expected.ListName,
+						test.expected.ProjectId,
+						test.expected.ProjectName,
 					)
 			}
 
 			query := `
         SELECT
           t.id,
-          t.description,
+          t.name,
           t.created,
           t.status,
-          t.listId,
-          l.name AS listName
+          t.projectId,
+          p.name AS projectName
         FROM
-          tasks AS t LEFT OUTER JOIN lists as l
+          tasks AS t LEFT OUTER JOIN projects as p
         ON
-          t.listId = l.id
+          t.projectId = p.id
         WHERE
           t.id = $1;`
 

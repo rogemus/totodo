@@ -14,8 +14,8 @@ func Test_CreateTask(t *testing.T) {
 	var empty_task model.Task
 
 	task := model.Task{
-		Description: "test task",
-		ListId:      0,
+		Name:      "test task",
+		ProjectId: 0,
 	}
 
 	testCases := []struct {
@@ -32,7 +32,7 @@ func Test_CreateTask(t *testing.T) {
 		},
 		{
 			name:        "error if empty task",
-			expectedErr: errors.New("empty description"),
+			expectedErr: errors.New("empty name"),
 			taskId:      -1,
 			task:        empty_task,
 		},
@@ -44,15 +44,15 @@ func Test_CreateTask(t *testing.T) {
 
 			query := `
         INSERT INTO
-          tasks (description, status, listId)
+          tasks (name, status, projectId)
         VALUES ($1, $2, $3);`
 
 			mock.
 				ExpectExec(query).
 				WithArgs(
-					test.task.Description,
+					test.task.Name,
 					test.task.Status,
-					test.task.ListId,
+					test.task.ProjectId,
 				).
 				WillReturnResult(sqlmock.NewResult(test.taskId, 1))
 

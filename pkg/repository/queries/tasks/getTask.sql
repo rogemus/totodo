@@ -1,14 +1,14 @@
 SELECT
   t.id,
-  t.description,
+  t.name,
   t.created,
   t.status,
-  t.listId,
-  l.name AS listName
+  t.projectId,
+  p.name AS projectName
 FROM
-  tasks AS t LEFT OUTER JOIN lists as l
+  tasks AS t LEFT OUTER JOIN projects as p
 ON
-  t.listId = l.id
+  t.projectId = p.id
 WHERE
   t.id = $1;
 
