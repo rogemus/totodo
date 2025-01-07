@@ -12,28 +12,28 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_GetList(t *testing.T) {
-	var empty_list model.List
+func Test_GetProject(t *testing.T) {
+	var empty_list model.Project
 	createdDate, _ := time.Parse("2006-01-02 15:04:05", "2024-09-08 19:15:17")
-	list := model.List{
+	project := model.Project{
 		Id:      1,
-		Name:    "test list",
+		Name:    "test project",
 		Created: createdDate,
 	}
 
 	testCases := []struct {
 		name        string
-		expected    model.List
-		listId      int
+		expected    model.Project
+		projectId   int
 		expectedErr error
 	}{
 		{
-			name:        "returns list",
-			expected:    list,
+			name:        "returns projects",
+			expected:    project,
 			expectedErr: nil,
 		},
 		{
-			name:        "returns empty list",
+			name:        "returns empty projects",
 			expected:    empty_list,
 			expectedErr: sql.ErrNoRows,
 		},
@@ -61,21 +61,21 @@ func Test_GetList(t *testing.T) {
 
 			query := `
         SELECT
-          l.id,
-          l.name,
-          l.created
+          p.id,
+          p.name,
+          p.created
         FROM
-          lists AS l
+          projects AS p
         WHERE
-          l.id = $1;`
+          p.id = $1;`
 
 			mock.
 				ExpectQuery(query).
 				WithArgs(test.expected.Id).
 				WillReturnRows(expectedRows)
 
-			repo := repository.NewListRepository(db)
-			result, getErr := repo.GetList(test.expected.Id)
+			repo := repository.NewProjectsRepository(db)
+			result, getErr := repo.GetProject(test.expected.Id)
 			sqlErr := mock.ExpectationsWereMet()
 
 			assert.Equal(t, sqlErr, nil)

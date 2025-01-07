@@ -4,16 +4,16 @@ import (
 	"time"
 )
 
-type List struct {
+type Project struct {
 	Id      int
 	Name    string
 	Created time.Time
 }
 
-func NewList(name string) List {
+func NewProject(name string) Project {
 	created := time.Now()
 
-	return List{
+	return Project{
 		Name:    name,
 		Created: created,
 	}

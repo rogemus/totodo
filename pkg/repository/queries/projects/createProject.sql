@@ -1,3 +1,3 @@
 INSERT INTO
-  lists (name)
+  projects (name)
 VALUES ($1);

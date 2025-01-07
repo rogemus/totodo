@@ -10,30 +10,30 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_CreateList(t *testing.T) {
-	var empty_list model.List
+func Test_CreateProject(t *testing.T) {
+	var empty_list model.Project
 
-	list := model.List{
+	project := model.Project{
 		Name: "test list",
 	}
 
 	testCases := []struct {
 		name        string
-		list        model.List
-		listId      int64
+		project     model.Project
+		projectId   int64
 		expectedErr error
 	}{
 		{
-			name:        "create list",
-			list:        list,
-			listId:      0,
+			name:        "create project",
+			project:     project,
+			projectId:   0,
 			expectedErr: nil,
 		},
 		{
 			name:        "error if empty name",
 			expectedErr: errors.New("empty name"),
-			list:        empty_list,
-			listId:      -1,
+			project:     empty_list,
+			projectId:   -1,
 		},
 	}
 
@@ -43,21 +43,21 @@ func Test_CreateList(t *testing.T) {
 
 			query := `
         INSERT INTO
-          lists (name)
+          projects (name)
         VALUES ($1);`
 
 			mock.
 				ExpectExec(query).
 				WithArgs(
-					test.list.Name,
+					test.project.Name,
 				).
-				WillReturnResult(sqlmock.NewResult(test.listId, 1))
+				WillReturnResult(sqlmock.NewResult(test.projectId, 1))
 
-			repo := repository.NewListRepository(db)
-			id, createErr := repo.CreateList(test.list)
+			repo := repository.NewProjectsRepository(db)
+			id, createErr := repo.CreateProject(test.project)
 
 			assert.Equal(t, test.expectedErr, createErr)
-			assert.Equal(t, test.listId, id)
+			assert.Equal(t, test.projectId, id)
 		})
 	}
 }

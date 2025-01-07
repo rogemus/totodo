@@ -15,7 +15,7 @@ func Test_CreateTask(t *testing.T) {
 
 	task := model.Task{
 		Description: "test task",
-		ListId:      0,
+		ProjectId:      0,
 	}
 
 	testCases := []struct {
@@ -44,7 +44,7 @@ func Test_CreateTask(t *testing.T) {
 
 			query := `
         INSERT INTO
-          tasks (description, status, listId)
+          tasks (description, status, projectId)
         VALUES ($1, $2, $3);`
 
 			mock.
@@ -52,7 +52,7 @@ func Test_CreateTask(t *testing.T) {
 				WithArgs(
 					test.task.Description,
 					test.task.Status,
-					test.task.ListId,
+					test.task.ProjectId,
 				).
 				WillReturnResult(sqlmock.NewResult(test.taskId, 1))
 

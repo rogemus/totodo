@@ -8,22 +8,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_DeleteList(t *testing.T) {
+func Test_DeleteProject(t *testing.T) {
 	testCases := []struct {
 		name           string
-		listId         int
+		projectId      int
 		expectedErr    error
 		expectedSqlErr error
 	}{
 		{
-			name:           "delete list",
-			listId:         1,
+			name:           "delete project",
+			projectId:      1,
 			expectedErr:    nil,
 			expectedSqlErr: nil,
 		},
 		{
-			name:           "no error if no list to delete",
-			listId:         -1,
+			name:           "no error if no project to delete",
+			projectId:      -1,
 			expectedErr:    nil,
 			expectedSqlErr: nil,
 		},
@@ -35,18 +35,18 @@ func Test_DeleteList(t *testing.T) {
 
 			query := `
         DELETE FROM
-          lists AS l
+          projects AS p
         WHERE
-          l.id = $1;
+          p.id = $1;
       `
 			mock.
 				ExpectExec(query).
-				WithArgs(test.listId).
-				WillReturnResult(sqlmock.NewResult(int64(test.listId), 1)).
+				WithArgs(test.projectId).
+				WillReturnResult(sqlmock.NewResult(int64(test.projectId), 1)).
 				WillReturnError(test.expectedSqlErr)
 
-			repo := repository.NewListRepository(db)
-			deleteErr := repo.DeleteList(test.listId)
+			repo := repository.NewProjectsRepository(db)
+			deleteErr := repo.DeleteProject(test.projectId)
 			sqlErr := mock.ExpectationsWereMet()
 
 			assert.Equal(t, test.expectedErr, deleteErr)

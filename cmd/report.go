@@ -119,7 +119,7 @@ func (cmd reportCmd) listReport() {
 		createdCol := CreatedStyle.Render(task.GetTimeSinceCreation())
 		statusCol := TodoStatusStyles.Render(statusIcon)
 		titleCol := fmt.Sprintf("%s%s", ActiveTitleStyles.Render(task.Description), ActiveStatusStyles.Render("★"))
-		listCol := ListTitleStyles.Render(fmt.Sprintf("@%s", task.ListName))
+		listCol := ListTitleStyles.Render(fmt.Sprintf("@%s", task.ProjectName))
 
 		t.Row(idCol, statusCol, titleCol, createdCol, listCol)
 	}
@@ -132,7 +132,7 @@ func (cmd reportCmd) listReport() {
 		createdCol := CreatedStyle.Render(task.GetTimeSinceCreation())
 		statusCol := TodoStatusStyles.Render(statusIcon)
 		titleCol := TodoTitleStyles.Render(task.Description)
-		listCol := ListTitleStyles.Render(fmt.Sprintf("@%s", task.ListName))
+		listCol := ListTitleStyles.Render(fmt.Sprintf("@%s", task.ProjectName))
 
 		t.Row(idCol, statusCol, titleCol, createdCol, listCol)
 	}
@@ -143,7 +143,7 @@ func (cmd reportCmd) listReport() {
 		createdCol := CreatedStyle.Render(task.GetTimeSinceCreation())
 		statusCol := DoneStatusStyles.Render(statusIcon)
 		titleCol := DoneTitleStyles.Render(task.Description)
-		listCol := ListTitleStyles.Render(fmt.Sprintf("@%s", task.ListName))
+		listCol := ListTitleStyles.Render(fmt.Sprintf("@%s", task.ProjectName))
 
 		t.Row(idCol, statusCol, titleCol, createdCol, listCol)
 	}

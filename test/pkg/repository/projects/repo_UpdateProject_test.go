@@ -9,28 +9,28 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_UpdateList(t *testing.T) {
-	list_original := model.List{
+func Test_UpdateProject(t *testing.T) {
+	project_original := model.Project{
 		Id:   1,
 		Name: "test list",
 	}
-	list_updated := model.List{
+	project_updated := model.Project{
 		Id:   1,
 		Name: "udpated",
 	}
 	testCases := []struct {
-		name           string
-		originalList   model.List
-		updatedList    model.List
-		expectedErr    error
-		expectedSqlErr error
+		name            string
+		originalProject model.Project
+		updatedProject  model.Project
+		expectedErr     error
+		expectedSqlErr  error
 	}{
 		{
-			name:           "update task",
-			originalList:   list_original,
-			updatedList:    list_updated,
-			expectedErr:    nil,
-			expectedSqlErr: nil,
+			name:            "update project",
+			originalProject: project_original,
+			updatedProject:  project_updated,
+			expectedErr:     nil,
+			expectedSqlErr:  nil,
 		},
 	}
 
@@ -40,20 +40,20 @@ func Test_UpdateList(t *testing.T) {
 
 			query := `
         UPDATE 
-          lists AS l
+          projects AS p
         SET
-          l.name = $2
+          p.name = $2
         WHERE
-          l.id = $1;
+          p.id = $1;
       `
 			mock.
 				ExpectExec(query).
-				WithArgs(test.updatedList.Name, test.originalList.Id).
+				WithArgs(test.updatedProject.Name, test.originalProject.Id).
 				WillReturnResult(sqlmock.NewResult(1, 1)).
 				WillReturnError(test.expectedSqlErr)
 
-			repo := repository.NewListRepository(db)
-			updateErr := repo.UpdateList(test.updatedList)
+			repo := repository.NewProjectsRepository(db)
+			updateErr := repo.UpdateProject(test.updatedProject)
 			sqlErr := mock.ExpectationsWereMet()
 
 			assert.Equal(t, test.expectedErr, updateErr)

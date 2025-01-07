@@ -1,6 +1,10 @@
-.PHONY: test
+.PHONY: test tui
 
 test:
 	@echo "Testing..."
 	go test ./test/... -v
+
+tui:
+	@echo "Starting TUI..."
+	go run main.go
 

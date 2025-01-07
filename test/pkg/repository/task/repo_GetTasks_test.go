@@ -18,16 +18,16 @@ func Test_GetTasks(t *testing.T) {
 		Description: "test task",
 		Created:     createdDate,
 		Status:      "todo",
-		ListId:      1,
-		ListName:    "testing",
+		ProjectId:   1,
+		ProjectName: "testing",
 	}
 	task_2 := model.Task{
 		Id:          2,
 		Description: "test task 2",
 		Created:     createdDate,
 		Status:      "todo",
-		ListId:      1,
-		ListName:    "testing",
+		ProjectId:   1,
+		ProjectName: "testing",
 	}
 	tasks := append(empty_tasks, task_1)
 	tasks = append(tasks, task_2)
@@ -58,8 +58,8 @@ func Test_GetTasks(t *testing.T) {
 				"description",
 				"created",
 				"status",
-				"listId",
-				"listName",
+				"projectId",
+				"projectName",
 			}
 			expectedRows := sqlmock.NewRows(columns)
 
@@ -69,8 +69,8 @@ func Test_GetTasks(t *testing.T) {
 					task.Description,
 					task.Created,
 					task.Status,
-					task.ListId,
-					task.ListName,
+					task.ProjectId,
+					task.ProjectName,
 				)
 			}
 
@@ -80,12 +80,12 @@ func Test_GetTasks(t *testing.T) {
           t.description,
           t.created,
           t.status,
-          t.listId,
-          l.name AS listName
+          t.projectId,
+          p.name AS projectName
         FROM
-          tasks AS t LEFT OUTER JOIN lists as l
+          tasks AS t LEFT OUTER JOIN projects as p
         ON
-          t.listId = l.id
+          t.projectId = p.id
         ORDER BY
           t.created
         DESC;`

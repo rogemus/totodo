@@ -10,8 +10,8 @@ const createDb string = `
     created       DATETIME DEFAULT CURRENT_TIMESTAMP,
     description   TEXT NOT NULL,
     status        TEXT NOT NULL,
-    listId        INTEGER NOT NULL,
-    FOREIGN KEY(listId) REFERENCES lists(listId)
+    projectId        INTEGER NOT NULL,
+    FOREIGN KEY(projectId) REFERENCES projects(projectId)
   );
 
   CREATE TABLE IF NOT EXISTS lists (
@@ -20,11 +20,11 @@ const createDb string = `
     name      TEXT NOT NULL
   );
 
-  INSERT INTO lists (id, name) VALUES 
+  INSERT INTO projects (id, name) VALUES 
     (1, "tasks"),
     (2, "coding");
 
-  INSERT INTO tasks (id, description, status, listId) VALUES 
+  INSERT INTO tasks (id, description, status, projectId) VALUES 
     (1, "K2-11: component", "todo", 2),
     (2, "K2-47: comp v2", "todo", 2),
     (3, "K2-64: bug comp", "done", 2),

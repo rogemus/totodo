@@ -6,7 +6,7 @@ import (
 	"os"
 	"totodo/cmd"
 	"totodo/pkg"
-	"totodo/pkg/model"
+	// "totodo/pkg/model"
 	repo "totodo/pkg/repository"
 
 	"github.com/joho/godotenv"
@@ -31,45 +31,48 @@ func main() {
 
 	// Init Repositories
 	tasksRepo := repo.NewTasksRepository(db)
+	projectsRepo := repo.NewProjectsRepository(db)
+
+	// Init TUI
+	tuiApp := cmd.NewTui(projectsRepo, tasksRepo)
 
 	// Init commands
-	addCmd := cmd.NewAddCmd(tasksRepo)
-	reportCmd := cmd.NewReportCmd(tasksRepo)
-	showCmd := cmd.NewShowCmd(tasksRepo)
-	editCmd := cmd.NewEditCmd(tasksRepo)
-	deleteCmd := cmd.NewDeleteCmd(tasksRepo)
-	helpCmd := cmd.NewHelpCmd([]model.Cmd{
-		addCmd,
-		deleteCmd,
-		editCmd,
-		reportCmd,
-		showCmd,
-	})
+	// addCmd := cmd.NewAddCmd(tasksRepo)
+	// reportCmd := cmd.NewReportCmd(tasksRepo)
+	// showCmd := cmd.NewShowCmd(tasksRepo)
+	// editCmd := cmd.NewEditCmd(tasksRepo)
+	// deleteCmd := cmd.NewDeleteCmd(tasksRepo)
+	// helpCmd := cmd.NewHelpCmd([]model.Cmd{
+	// 	addCmd,
+	// 	deleteCmd,
+	// 	editCmd,
+	// 	reportCmd,
+	// 	showCmd,
+	// })
 
-	// TODO: run TUI
 	if len(os.Args) == 1 {
-		helpCmd.Run()
+		tuiApp.Run()
 		return
 	}
 
-	command := os.Args[1]
-	args := os.Args[2:]
+	// command := os.Args[1]
+	// args := os.Args[2:]
 
-	switch command {
-	case deleteCmd.Cmd:
-		deleteCmd.Run(args)
-	case addCmd.Cmd:
-		addCmd.Run(args)
-	case editCmd.Cmd:
-		editCmd.Run(args)
-	case reportCmd.Cmd:
-		reportCmd.Run(args)
-	case showCmd.Cmd:
-		showCmd.Run(args)
-	case helpCmd.Cmd:
-		helpCmd.Run()
-	default:
-		fmt.Println("Invalid comand. See available options:")
-		helpCmd.Run()
-	}
+	// switch command {
+	// case deleteCmd.Cmd:
+	// 	deleteCmd.Run(args)
+	// case addCmd.Cmd:
+	// 	addCmd.Run(args)
+	// case editCmd.Cmd:
+	// 	editCmd.Run(args)
+	// case reportCmd.Cmd:
+	// 	reportCmd.Run(args)
+	// case showCmd.Cmd:
+	// 	showCmd.Run(args)
+	// case helpCmd.Cmd:
+	// 	helpCmd.Run()
+	// default:
+	// 	fmt.Println("Invalid comand. See available options:")
+	// 	helpCmd.Run()
+	// }
 }

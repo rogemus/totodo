@@ -22,8 +22,8 @@ type Task struct {
 	Description string
 	Created     time.Time
 	Status      string
-	ListId      int
-	ListName    string
+	ProjectId      int
+	ProjectName    string
 }
 
 func NewTask(desc string, listId int) Task {
@@ -33,8 +33,24 @@ func NewTask(desc string, listId int) Task {
 		Description: desc,
 		Created:     created,
 		Status:      Status.TODO,
-		ListId:      listId,
+		ProjectId:      listId,
 	}
+}
+
+func (t *Task) GetListEntry() string {
+	id := fmt.Sprintf("[dim]%d[-]", t.Id)
+	description := fmt.Sprintf("[cyan]%s[-]", t.Description)
+	created := t.GetEntryCreation()
+	entry := fmt.Sprintf("%s %s %s", id, description, created)
+	return entry
+}
+
+func (t *Task) GetEntryStatus() string {
+	if t.Status == Status.DONE {
+		return "[green]✓[-]"
+	}
+
+	return "[magenta]☐[-]"
 }
 
 func (t *Task) GetStatusIcon() string {
@@ -43,6 +59,11 @@ func (t *Task) GetStatusIcon() string {
 	}
 
 	return "☐"
+}
+
+func (t *Task) GetEntryCreation() string {
+	time := t.GetTimeSinceCreation()
+	return fmt.Sprintf("[dim]%s[-]", time)
 }
 
 func (t *Task) GetTimeSinceCreation() string {

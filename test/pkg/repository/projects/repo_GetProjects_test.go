@@ -10,34 +10,34 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_GetLists(t *testing.T) {
-	empty_list := make([]model.List, 0)
+func Test_GetProjects(t *testing.T) {
+	empty_list := make([]model.Project, 0)
 	createdDate, _ := time.Parse("2006-01-02 15:04:05", "2024-09-08 19:15:17")
-	list_1 := model.List{
+	project_1 := model.Project{
 		Id:      1,
-		Name:    "test list",
+		Name:    "test project",
 		Created: createdDate,
 	}
-	list_2 := model.List{
+	project_2 := model.Project{
 		Id:      2,
-		Name:    "test list 2",
+		Name:    "test project 2",
 		Created: createdDate,
 	}
-	lists := append(empty_list, list_1)
-	lists = append(lists, list_2)
+	projects := append(empty_list, project_1)
+	projects = append(projects, project_2)
 
 	testCases := []struct {
 		name        string
-		expected    []model.List
+		expected    []model.Project
 		expectedErr error
 	}{
 		{
-			name:        "returns array of lists",
-			expected:    lists,
+			name:        "returns array of projects",
+			expected:    projects,
 			expectedErr: nil,
 		},
 		{
-			name:        "returns empty array of lists",
+			name:        "returns empty array of projects",
 			expected:    empty_list,
 			expectedErr: nil,
 		},
@@ -64,13 +64,13 @@ func Test_GetLists(t *testing.T) {
 
 			query := `
         SELECT
-          l.id,
-          l.name,
-          l.created
+          p.id,
+          p.name,
+          p.created
         FROM
-          lists AS l
+          projects AS p
         ORDER BY
-          l.created
+          p.created
         DESC;`
 
 			mock.
@@ -80,8 +80,8 @@ func Test_GetLists(t *testing.T) {
 
 			defer db.Close()
 
-			repo := repository.NewListRepository(db)
-			result, getErr := repo.GetLists()
+			repo := repository.NewProjectsRepository(db)
+			result, getErr := repo.GetProjects()
 			sqlErr := mock.ExpectationsWereMet()
 
 			assert.Equal(t, sqlErr, nil)

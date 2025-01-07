@@ -49,8 +49,8 @@ func Test_GetTask(t *testing.T) {
 				"description",
 				"created",
 				"status",
-				"listId",
-				"listName",
+				"projectId",
+				"projectName",
 			}
 			expectedRows := sqlmock.NewRows(columns)
 
@@ -61,8 +61,8 @@ func Test_GetTask(t *testing.T) {
 						test.expected.Description,
 						test.expected.Created,
 						test.expected.Status,
-						test.expected.ListId,
-						test.expected.ListName,
+						test.expected.ProjectId,
+						test.expected.ProjectName,
 					)
 			}
 
@@ -72,12 +72,12 @@ func Test_GetTask(t *testing.T) {
           t.description,
           t.created,
           t.status,
-          t.listId,
-          l.name AS listName
+          t.projectId,
+          p.name AS projectName
         FROM
-          tasks AS t LEFT OUTER JOIN lists as l
+          tasks AS t LEFT OUTER JOIN projects as p
         ON
-          t.listId = l.id
+          t.projectId = p.id
         WHERE
           t.id = $1;`
 

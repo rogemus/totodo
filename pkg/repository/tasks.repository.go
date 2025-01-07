@@ -45,8 +45,8 @@ func (r *tasksRepository) GetTask(id int) (model.Task, error) {
 		&task.Description,
 		&task.Created,
 		&task.Status,
-		&task.ListId,
-		&task.ListName,
+		&task.ProjectId,
+		&task.ProjectName,
 	)
 
 	if err != nil {
@@ -74,8 +74,8 @@ func (r *tasksRepository) GetTasks() ([]model.Task, error) {
 			&task.Description,
 			&task.Created,
 			&task.Status,
-			&task.ListId,
-			&task.ListName,
+			&task.ProjectId,
+			&task.ProjectName,
 		)
 
 		if err != nil {
@@ -117,7 +117,7 @@ func (r *tasksRepository) CreateTask(task model.Task) (int64, error) {
 		return -1, errors.New("empty description")
 	}
 
-	result, err := r.db.Exec(createTaskQuery, task.Description, task.Status, task.ListId)
+	result, err := r.db.Exec(createTaskQuery, task.Description, task.Status, task.ProjectId)
 
 	if err != nil {
 		return -1, err

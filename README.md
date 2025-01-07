@@ -26,3 +26,17 @@
 
 1. https://github.com/klaudiosinani/taskbook
 2. https://github.com/darrikonn/td-cli
+
+
+## Flow
+
+1. List project
+2. Create project if no project
+3. Select project
+
+4. List tasks in selected project
+5. Create task
+6. Mark as done
+7. Delete
+8. Edit
+
