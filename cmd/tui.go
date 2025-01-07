@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"totodo/pkg/model"
 	"totodo/pkg/repository"
 	"totodo/pkg/tui/views"
 
@@ -30,26 +29,17 @@ type TUIModel struct {
 	createTaskModel    tea.Model
 	deleteTaskModel    tea.Model
 
-	selectedView    selectedView
-	selectedTask    model.Task
-	selectedProject model.Project
+	selectedView selectedView
 }
 
 func NewTui(projectsRepo repository.ProjectsRepository, tasksRepo repository.TasksRepository) TUIModel {
-	projectsListModel := views.NewProjectsListViewModel(projectsRepo)
-	createProjectModel := views.NewCreateProjectViewModel(projectsRepo)
-	deleteProjectModel := views.NewDeleteProjectViewModel(projectsRepo)
-	tasksListModel := views.NewTasksListViewModel(projectsRepo)
-	createTaskModel := views.NewCreateTaskViewModel(projectsRepo)
-	deleteTaskModel := views.NewDeleteTaskViewModel(projectsRepo)
-
 	return TUIModel{
-		projectsListModel:  projectsListModel,
-		createProjectModel: createProjectModel,
-		deleteProjectModel: deleteProjectModel,
-		tasksListModel:     tasksListModel,
-		createTaskModel:    createTaskModel,
-		deleteTaskModel:    deleteTaskModel,
+		projectsListModel:  views.NewProjectsListViewModel(projectsRepo),
+		createProjectModel: views.NewCreateProjectViewModel(projectsRepo),
+		deleteProjectModel: views.NewDeleteProjectViewModel(projectsRepo),
+		tasksListModel:     views.NewTasksListViewModel(projectsRepo),
+		createTaskModel:    views.NewCreateTaskViewModel(projectsRepo),
+		deleteTaskModel:    views.NewDeleteTaskViewModel(projectsRepo),
 
 		selectedView: PROJECTS_LIST_VIEW,
 	}
@@ -75,6 +65,9 @@ func (m TUIModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "s":
 			m.selectedView = PROJECTS_LIST_VIEW
+
+		case "t":
+			m.selectedView = TASKS_LIST_VIEW
 
 		case "x":
 			m.selectedView = DELETE_TASK_VIEW
