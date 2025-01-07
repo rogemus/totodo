@@ -32,14 +32,17 @@ type TUIModel struct {
 	selectedView selectedView
 }
 
-func NewTui(projectsRepo repository.ProjectsRepository, tasksRepo repository.TasksRepository) TUIModel {
+func NewTui(
+	projectsRepo repository.ProjectsRepository,
+	tasksRepo repository.TasksRepository,
+) TUIModel {
 	return TUIModel{
 		projectsListModel:  views.NewProjectsListViewModel(projectsRepo),
 		createProjectModel: views.NewCreateProjectViewModel(projectsRepo),
 		deleteProjectModel: views.NewDeleteProjectViewModel(projectsRepo),
-		tasksListModel:     views.NewTasksListViewModel(projectsRepo),
-		createTaskModel:    views.NewCreateTaskViewModel(projectsRepo),
-		deleteTaskModel:    views.NewDeleteTaskViewModel(projectsRepo),
+		tasksListModel:     views.NewTasksListViewModel(tasksRepo),
+		createTaskModel:    views.NewCreateTaskViewModel(tasksRepo),
+		deleteTaskModel:    views.NewDeleteTaskViewModel(tasksRepo),
 
 		selectedView: PROJECTS_LIST_VIEW,
 	}

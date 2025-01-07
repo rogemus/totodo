@@ -7,7 +7,7 @@ import (
 
 type createTaskViewModel struct{}
 
-func NewCreateTaskViewModel(listRepo repository.ProjectsRepository) createTaskViewModel {
+func NewCreateTaskViewModel(repo repository.TasksRepository) createTaskViewModel {
 	return createTaskViewModel{}
 }
 

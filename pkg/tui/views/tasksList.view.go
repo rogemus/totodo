@@ -13,7 +13,7 @@ type tasksListViewModel struct {
 	project *model.Project
 }
 
-func NewTasksListViewModel(listRepo repository.ProjectsRepository) tasksListViewModel {
+func NewTasksListViewModel(repo repository.TasksRepository) tasksListViewModel {
 	return tasksListViewModel{}
 }
 

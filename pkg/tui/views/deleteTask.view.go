@@ -7,7 +7,7 @@ import (
 
 type deleteTaskViewModel struct{}
 
-func NewDeleteTaskViewModel(listRepo repository.ProjectsRepository) deleteTaskViewModel {
+func NewDeleteTaskViewModel(repo repository.TasksRepository) deleteTaskViewModel {
 	return deleteTaskViewModel{}
 }
 
@@ -23,4 +23,3 @@ func (m deleteTaskViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	return m, cmd
 }
-
