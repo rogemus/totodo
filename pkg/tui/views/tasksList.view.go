@@ -63,6 +63,10 @@ func (m tasksListViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			return m, tea.Batch(tui.NewChangeViewCmd(tui.DELETE_TASK_VIEW), tea.WindowSize())
+
+		case "esc":
+			return m, nil
+			// do nothing
 		}
 	}
 

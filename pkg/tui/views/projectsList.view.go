@@ -52,6 +52,9 @@ func (m projectsListViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {
 
+		case "esc":
+			return m, nil
+
 		case "enter":
 			project, ok := m.list.SelectedItem().(model.Project)
 

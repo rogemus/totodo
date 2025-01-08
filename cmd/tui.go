@@ -39,17 +39,6 @@ func (m TUIModel) Init() tea.Cmd { return nil }
 func (m TUIModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
-	switch msg := msg.(type) {
-	case tui.ChangeViewMsg:
-		m.selectedView = tui.TuiView(msg)
-
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c", "q":
-			return m, tea.Quit
-		}
-	}
-
 	switch m.selectedView {
 	case tui.PROJECTS_LIST_VIEW:
 		m.projectsListModel, cmd = m.projectsListModel.Update(msg)
@@ -68,6 +57,20 @@ func (m TUIModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tui.DELETE_TASK_VIEW:
 		m.deleteTaskModel, cmd = m.deleteTaskModel.Update(msg)
+	}
+
+	switch msg := msg.(type) {
+	case tui.ChangeViewMsg:
+		m.selectedView = tui.TuiView(msg)
+
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "ctrl+c", "q":
+			return m, tea.Quit
+
+		case "s":
+			return m, tea.Batch(tui.NewChangeViewCmd(tui.PROJECTS_LIST_VIEW), tea.WindowSize())
+		}
 	}
 
 	return m, cmd
@@ -102,6 +105,7 @@ func (m TUIModel) Run() {
 
 	if _, err := p.Run(); err != nil {
 		fmt.Println("Ups ...")
+		fmt.Print(err)
 		os.Exit(1)
 	}
 }
