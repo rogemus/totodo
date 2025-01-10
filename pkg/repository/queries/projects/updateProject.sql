@@ -1,6 +1,6 @@
 UPDATE
   projects AS p
 SET
-  p.name = $2
+  name = ?
 WHERE
-  p.id = $1;
+  p.id = ?;

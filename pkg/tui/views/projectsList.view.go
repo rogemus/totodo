@@ -62,6 +62,13 @@ func (m projectsListViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 
+		case "e":
+			project, ok := m.list.SelectedItem().(model.Project)
+
+			if ok {
+				return m, tea.Batch(tui.NewChangeViewWithProject(project, tui.CREATE_PROJECT_VIEW), tea.WindowSize())
+			}
+
 		case "a":
 			return m, tea.Batch(tui.NewChangeViewCmd(tui.CREATE_PROJECT_VIEW), tea.WindowSize())
 

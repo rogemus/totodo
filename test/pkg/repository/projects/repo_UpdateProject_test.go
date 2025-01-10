@@ -42,9 +42,9 @@ func Test_UpdateProject(t *testing.T) {
         UPDATE 
           projects AS p
         SET
-          p.name = $2
+          name = ?
         WHERE
-          p.id = $1;
+          p.id = ?;
       `
 			mock.
 				ExpectExec(query).

@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
+	"fmt"
 	"totodo/pkg/model"
+	"totodo/pkg/utils"
 )
 
 var (
@@ -23,7 +25,7 @@ var (
 type ProjectsRepository interface {
 	GetProject(id int) (model.Project, error)
 	GetProjects() ([]model.Project, error)
-	UpdateProject(list model.Project) error
+	UpdateProject(project model.Project) error
 	DeleteProject(id int) error
 	CreateProject(project model.Project) (int64, error)
 }
@@ -37,26 +39,32 @@ func NewProjectsRepository(db *sql.DB) ProjectsRepository {
 }
 
 func (r *projectsRepository) GetProject(id int) (model.Project, error) {
-	var list model.Project
+	utils.Log.Info(fmt.Sprintf("Getting Project: Project [%d]", id))
+
+	var project model.Project
 
 	row := r.db.QueryRow(getProjectQuery, id)
 	err := row.Scan(
-		&list.Id,
-		&list.Name,
-		&list.Created,
+		&project.Id,
+		&project.Name,
+		&project.Created,
 	)
 
 	if err != nil {
-		return list, err
+		utils.Log.Error(err)
+		return project, err
 	}
 
-	return list, nil
+	utils.Log.Success(fmt.Sprintf("Got Project: Project [%d] (%s)", project.Id, project.Name))
+	return project, nil
 }
 
 func (r *projectsRepository) GetProjects() ([]model.Project, error) {
+	utils.Log.Info("Getting All Projects")
 	rows, err := r.db.Query(getProjectsQuery)
 
 	if err != nil {
+		utils.Log.Error(err)
 		return nil, err
 	}
 
@@ -73,6 +81,7 @@ func (r *projectsRepository) GetProjects() ([]model.Project, error) {
 		)
 
 		if err != nil {
+			utils.Log.Error(err)
 			return nil, err
 		}
 
@@ -80,48 +89,63 @@ func (r *projectsRepository) GetProjects() ([]model.Project, error) {
 	}
 
 	if err := rows.Err(); err != nil {
+		utils.Log.Error(err)
 		return nil, err
 	}
 
+	utils.Log.Success(fmt.Sprintf("Got Projects: Projects Count [%d]", len(projects)))
 	return projects, nil
 }
 
-func (r *projectsRepository) UpdateProject(list model.Project) error {
-	_, err := r.db.Exec(updateProjectQuery, list.Name, list.Id)
+func (r *projectsRepository) UpdateProject(project model.Project) error {
+	utils.Log.Info(fmt.Sprintf("Updating Project: Project [%d]", project.Id))
+
+	_, err := r.db.Exec(updateProjectQuery, project.Name, project.Id)
 
 	if err != nil {
+		utils.Log.Error(err)
 		return err
 	}
 
+	utils.Log.Success(fmt.Sprintf("Updated Project: Project [%d] (%s)", project.Id, project.Name))
 	return nil
 }
 
 func (r *projectsRepository) DeleteProject(id int) error {
+	utils.Log.Info(fmt.Sprintf("Deleting Project: Project [%d]", id))
+
 	_, err := r.db.Exec(deleteProjectQuery, id)
 
 	if err != nil {
+		utils.Log.Error(err)
 		return err
 	}
 
+	utils.Log.Success(fmt.Sprintf("Deleted Project: Project [%d]", id))
 	return nil
 }
 
-func (r *projectsRepository) CreateProject(list model.Project) (int64, error) {
-	if list.Name == "" {
+func (r *projectsRepository) CreateProject(project model.Project) (int64, error) {
+	utils.Log.Info(fmt.Sprintf("Creating Project: Project (%s)", project.Name))
+
+	if project.Name == "" {
 		return -1, errors.New("empty name")
 	}
 
-	result, err := r.db.Exec(createProjectQuery, list.Name)
+	result, err := r.db.Exec(createProjectQuery, project.Name)
 
 	if err != nil {
+		utils.Log.Error(err)
 		return -1, err
 	}
 
 	id, err := result.LastInsertId()
 
 	if err != nil {
+		utils.Log.Error(err)
 		return -1, err
 	}
 
+	utils.Log.Success(fmt.Sprintf("Project Created: Project [%d] (%s)", id, project.Name))
 	return id, nil
 }
