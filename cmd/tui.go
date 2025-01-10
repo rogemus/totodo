@@ -68,8 +68,8 @@ func (m TUIModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tui.ChangeViewMsg:
 		m.selectedView = msg.View
-
 	case tui.ChangeViewWithTaskMsg:
+		m.selectedView = msg.View
 	case tui.ChangeViewWithProjectMsg:
 		m.selectedView = msg.View
 	}
