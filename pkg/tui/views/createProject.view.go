@@ -87,7 +87,6 @@ func (m createProjectViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.focus = tui.NAME_INPUT
 		m.input.SetValue("")
 		m.input.Focus()
-		return m, nil
 
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {
@@ -113,6 +112,9 @@ func (m createProjectViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.focus == tui.CANCEL_BTN {
 				return m, tea.Batch(tui.NewChangeViewCmd(tui.PROJECTS_LIST_VIEW), tea.WindowSize())
 			}
+
+		case "ctrl+c":
+			return m, tea.Quit
 
 		case "esc":
 			return m, tea.Batch(tui.NewChangeViewCmd(tui.PROJECTS_LIST_VIEW), tea.WindowSize())

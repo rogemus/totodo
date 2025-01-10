@@ -1,7 +1,6 @@
 package views
 
 import (
-	"fmt"
 	"totodo/pkg/model"
 	"totodo/pkg/repository"
 	"totodo/pkg/tui"
@@ -16,6 +15,7 @@ type createTaskViewModel struct {
 	focus        tui.Focus
 	input        textinput.Model
 	repo         repository.TasksRepository
+	project      model.Project
 	windowHeight int
 	windowWidth  int
 }
@@ -84,11 +84,11 @@ func (m createTaskViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.windowWidth = msg.Width - h
 		m.windowHeight = msg.Height - v
 
-	case tui.ChangeViewMsg:
+	case tui.ChangeViewWithProjectMsg:
 		m.focus = tui.NAME_INPUT
+		m.project = msg.Project
 		m.input.Focus()
 		m.input.SetValue("")
-		return m, nil
 
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {
@@ -105,15 +105,8 @@ func (m createTaskViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "enter":
 			if m.focus == tui.CONFIRM_BTN {
-				project := tui.State.SelectedProject
-				task := model.NewTask(m.input.Value(), project.Id)
-
-				_, err := m.repo.CreateTask(task)
-
-				if err != nil {
-					fmt.Printf("%v", err)
-					return m, tea.Quit
-				}
+				task := model.NewTask(m.input.Value(), m.project.Id)
+				m.repo.CreateTask(task)
 
 				return m, tea.Batch(tui.NewChangeViewCmd(tui.TASKS_LIST_VIEW), tea.WindowSize())
 			}
@@ -121,6 +114,9 @@ func (m createTaskViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.focus == tui.CANCEL_BTN {
 				return m, tea.Batch(tui.NewChangeViewCmd(tui.TASKS_LIST_VIEW), tea.WindowSize())
 			}
+
+		case "ctrl+c":
+			return m, tea.Quit
 
 		case "esc":
 			return m, tea.Batch(tui.NewChangeViewCmd(tui.TASKS_LIST_VIEW), tea.WindowSize())

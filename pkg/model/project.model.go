@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -20,7 +21,7 @@ func NewProject(name string) Project {
 }
 
 func (p Project) Title() string {
-	return p.Name
+	return fmt.Sprintf("[%d] %s ", p.Id, p.Name)
 }
 
 func (p Project) Description() string {

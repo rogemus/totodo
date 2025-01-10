@@ -61,29 +61,29 @@ func (r *projectsRepository) GetProjects() ([]model.Project, error) {
 	}
 
 	defer rows.Close()
-	lists := make([]model.Project, 0)
+	projects := make([]model.Project, 0)
 
 	for rows.Next() {
-		var list model.Project
+		var project model.Project
 
 		err := rows.Scan(
-			&list.Id,
-			&list.Name,
-			&list.Created,
+			&project.Id,
+			&project.Name,
+			&project.Created,
 		)
 
 		if err != nil {
 			return nil, err
 		}
 
-		lists = append(lists, list)
+		projects = append(projects, project)
 	}
 
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 
-	return lists, nil
+	return projects, nil
 }
 
 func (r *projectsRepository) UpdateProject(list model.Project) error {

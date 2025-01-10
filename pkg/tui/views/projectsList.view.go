@@ -56,27 +56,25 @@ func (m projectsListViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 
 		case "enter":
-			project, ok := m.list.SelectedItem().(model.Project)
-
-			if ok {
-				tui.State.SetProject(project)
+			if project, ok := m.list.SelectedItem().(model.Project); ok {
+				return m, tea.Batch(tui.NewChangeViewWithProject(project, tui.TASKS_LIST_VIEW), tea.WindowSize())
+			} else {
+				return m, nil
 			}
-
-			return m, tea.Batch(tui.NewChangeViewCmd(tui.TASKS_LIST_VIEW), tea.WindowSize())
 
 		case "a":
 			return m, tea.Batch(tui.NewChangeViewCmd(tui.CREATE_PROJECT_VIEW), tea.WindowSize())
+
+		case "ctrl+c":
+			return m, tea.Quit
 
 		case "X":
 			project, ok := m.list.SelectedItem().(model.Project)
 
 			if ok {
-				tui.State.SetProject(project)
+				return m, tea.Batch(tui.NewChangeViewWithProject(project, tui.DELETE_PROJECT_VIEW), tea.WindowSize())
 			}
-
-			return m, tea.Batch(tui.NewChangeViewCmd(tui.DELETE_PROJECT_VIEW), tea.WindowSize())
 		}
-
 	}
 
 	m.list, cmd = m.list.Update(msg)

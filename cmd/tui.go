@@ -36,7 +36,7 @@ func NewTui(projectsRepo repository.ProjectsRepository, tasksRepo repository.Tas
 
 func (m TUIModel) Init() tea.Cmd { return nil }
 
-func (m TUIModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m TUIModel) UpdateModels(msg tea.Msg) (TUIModel, tea.Cmd) {
 	var cmd tea.Cmd
 
 	switch m.selectedView {
@@ -59,20 +59,22 @@ func (m TUIModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.deleteTaskModel, cmd = m.deleteTaskModel.Update(msg)
 	}
 
+	return m, cmd
+}
+
+func (m TUIModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd
+
 	switch msg := msg.(type) {
 	case tui.ChangeViewMsg:
-		m.selectedView = tui.TuiView(msg)
+		m.selectedView = msg.View
 
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c", "q":
-			return m, tea.Quit
-
-		case "s":
-			return m, tea.Batch(tui.NewChangeViewCmd(tui.PROJECTS_LIST_VIEW), tea.WindowSize())
-		}
+	case tui.ChangeViewWithTaskMsg:
+	case tui.ChangeViewWithProjectMsg:
+		m.selectedView = msg.View
 	}
 
+	m, cmd = m.UpdateModels(msg)
 	return m, cmd
 }
 
@@ -101,7 +103,17 @@ func (m TUIModel) View() string {
 }
 
 func (m TUIModel) Run() {
+	// p := tea.NewProgram(&m)
 	p := tea.NewProgram(&m, tea.WithAltScreen())
+
+	if len(os.Getenv("DEBUG")) > 0 {
+		f, err := tea.LogToFile("debug.log", "debug")
+		if err != nil {
+			fmt.Println("fatal:", err)
+			os.Exit(1)
+		}
+		defer f.Close()
+	}
 
 	if _, err := p.Run(); err != nil {
 		fmt.Println("Ups ...")

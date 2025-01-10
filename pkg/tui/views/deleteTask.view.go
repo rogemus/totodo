@@ -1,6 +1,7 @@
 package views
 
 import (
+	"totodo/pkg/model"
 	"totodo/pkg/repository"
 	"totodo/pkg/tui"
 	"totodo/pkg/ui"
@@ -11,6 +12,7 @@ import (
 
 type deleteTaskViewModel struct {
 	focus        tui.Focus
+	task         model.Task
 	repo         repository.TasksRepository
 	windowHeight int
 	windowWidth  int
@@ -75,9 +77,9 @@ func (m deleteTaskViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.windowWidth = msg.Width - h
 		m.windowHeight = msg.Height - v
 
-	case tui.ChangeViewMsg:
+	case tui.ChangeViewWithTaskMsg:
 		m.focus = tui.CONFIRM_BTN
-		return m, nil
+		m.task = msg.Task
 
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {
@@ -92,13 +94,14 @@ func (m deleteTaskViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "enter":
 			if m.focus == tui.CONFIRM_BTN {
-				task := tui.State.SelectedTask
-				m.repo.DeleteTask(task.Id)
-
+				m.repo.DeleteTask(m.task.Id)
 				return m, tea.Batch(tui.NewChangeViewCmd(tui.TASKS_LIST_VIEW), tea.WindowSize())
 			}
 
 			return m, tea.Batch(tui.NewChangeViewCmd(tui.TASKS_LIST_VIEW), tea.WindowSize())
+
+		case "ctrl+c":
+			return m, tea.Quit
 
 		case "esc":
 			return m, tea.Batch(tui.NewChangeViewCmd(tui.TASKS_LIST_VIEW), tea.WindowSize())
