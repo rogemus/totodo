@@ -16,9 +16,11 @@ func Test_GetProject(t *testing.T) {
 	var empty_list model.Project
 	createdDate, _ := time.Parse("2006-01-02 15:04:05", "2024-09-08 19:15:17")
 	project := model.Project{
-		Id:      1,
-		Name:    "test project",
-		Created: createdDate,
+		Id:             1,
+		Name:           "test project",
+		Created:        createdDate,
+		TasksCount:     0,
+		TasksDoneCount: 0,
 	}
 
 	testCases := []struct {
@@ -28,12 +30,12 @@ func Test_GetProject(t *testing.T) {
 		expectedErr error
 	}{
 		{
-			name:        "returns projects",
+			name:        "returns project",
 			expected:    project,
 			expectedErr: nil,
 		},
 		{
-			name:        "returns empty projects",
+			name:        "returns empty project",
 			expected:    empty_list,
 			expectedErr: sql.ErrNoRows,
 		},
@@ -47,6 +49,8 @@ func Test_GetProject(t *testing.T) {
 				"id",
 				"name",
 				"created",
+				"tasksDoneCount",
+				"tasksCount",
 			}
 			expectedRows := sqlmock.NewRows(columns)
 
@@ -56,6 +60,8 @@ func Test_GetProject(t *testing.T) {
 						test.expected.Id,
 						test.expected.Name,
 						test.expected.Created,
+						test.expected.TasksDoneCount,
+						test.expected.TasksCount,
 					)
 			}
 
@@ -63,11 +69,29 @@ func Test_GetProject(t *testing.T) {
         SELECT
           p.id,
           p.name,
-          p.created
+          p.created,
+          (
+            SELECT
+              COUNT(*)
+            FROM
+              tasks AS t
+            WHERE
+              t.projectId == $1 AND
+              t.status == 'done'
+          ) as tasksDoneCount,
+          (
+            SELECT
+              COUNT(*)
+            FROM
+              tasks AS t
+            WHERE
+              t.projectId == $1
+          ) as tasksCount
         FROM
           projects AS p
         WHERE
-          p.id = $1;`
+          p.id = $1;
+        `
 
 			mock.
 				ExpectQuery(query).

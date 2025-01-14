@@ -17,6 +17,8 @@ type createProjectViewModel struct {
 	repo         repository.ProjectsRepository
 	windowHeight int
 	windowWidth  int
+	isEditing    bool
+	project      model.Project
 }
 
 func NewCreateProjectViewModel(repo repository.ProjectsRepository) createProjectViewModel {
@@ -25,9 +27,10 @@ func NewCreateProjectViewModel(repo repository.ProjectsRepository) createProject
 	input.CharLimit = 125
 
 	return createProjectViewModel{
-		focus: tui.CONFIRM_BTN,
-		input: input,
-		repo:  repo,
+		focus:     tui.CONFIRM_BTN,
+		input:     input,
+		repo:      repo,
+		isEditing: false,
 	}
 }
 
@@ -36,6 +39,13 @@ func (m createProjectViewModel) Init() tea.Cmd { return nil }
 func (m createProjectViewModel) View() string {
 	cancelBtn := ui.CancelBtnStyle
 	confirmBtn := ui.ConfirmBtnStyle
+	confirmBtnText := "Create"
+	titleText := "Create Project"
+
+	if m.isEditing {
+		confirmBtnText = "Update"
+		titleText = "Update Project"
+	}
 
 	if m.focus == tui.CANCEL_BTN {
 		cancelBtn = cancelBtn.Background(ui.BrightColors.Red).Bold(true)
@@ -56,13 +66,13 @@ func (m createProjectViewModel) View() string {
 		ui.DialogFooterStyle.Render(
 			lipgloss.JoinHorizontal(lipgloss.Top,
 				cancelBtn.Render("Cancel"),
-				confirmBtn.Render("Create"),
+				confirmBtn.Render(confirmBtnText),
 			),
 		),
 	)
 
 	dialogWrapper := lipgloss.JoinVertical(lipgloss.Top,
-		ui.DialogTitleStyle.Render("Create Project"),
+		ui.DialogTitleStyle.Render(titleText),
 		ui.DialogBoxStyle.Render(dialogContent),
 	)
 
@@ -84,10 +94,18 @@ func (m createProjectViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.windowHeight = msg.Height - v
 
 	case tui.ChangeViewMsg:
+		m.project = model.Project{}
+		m.isEditing = false
 		m.focus = tui.NAME_INPUT
 		m.input.SetValue("")
 		m.input.Focus()
-		return m, nil
+
+	case tui.ChangeViewWithProjectMsg:
+		m.project = msg.Project
+		m.isEditing = true
+		m.focus = tui.NAME_INPUT
+		m.input.SetValue(msg.Project.Name)
+		m.input.Focus()
 
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {
@@ -104,8 +122,14 @@ func (m createProjectViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "enter":
 			if m.focus == tui.CONFIRM_BTN {
-				project := model.NewProject(m.input.Value())
-				m.repo.CreateProject(project)
+
+				if m.isEditing {
+					m.project.Name = m.input.Value()
+					m.repo.UpdateProject(m.project)
+				} else {
+					project := model.NewProject(m.input.Value())
+					m.repo.CreateProject(project)
+				}
 
 				return m, tea.Batch(tui.NewChangeViewCmd(tui.PROJECTS_LIST_VIEW), tea.WindowSize())
 			}
@@ -113,6 +137,9 @@ func (m createProjectViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.focus == tui.CANCEL_BTN {
 				return m, tea.Batch(tui.NewChangeViewCmd(tui.PROJECTS_LIST_VIEW), tea.WindowSize())
 			}
+
+		case "ctrl+c":
+			return m, tea.Quit
 
 		case "esc":
 			return m, tea.Batch(tui.NewChangeViewCmd(tui.PROJECTS_LIST_VIEW), tea.WindowSize())

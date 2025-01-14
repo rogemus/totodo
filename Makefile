@@ -6,5 +6,5 @@ test:
 
 tui:
 	@echo "Starting TUI..."
-	go run main.go
+	DEBUG=true go run main.go
 

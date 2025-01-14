@@ -9,6 +9,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type projectsListViewModel struct {
@@ -20,9 +21,14 @@ type projectsListViewModel struct {
 func NewProjectsListViewModel(repo repository.ProjectsRepository) projectsListViewModel {
 	projects, _ := repo.GetProjects()
 	items := utils.ConvertToListitem(projects)
+	list := list.New(items, model.NewProjectItemDelegate(), 0, 0)
+	list.SetShowStatusBar(false)
+	list.SetShowHelp(false)
+	list.SetShowTitle(false)
+	list.Title = "Select Project..."
 
 	m := projectsListViewModel{
-		list: list.New(items, list.NewDefaultDelegate(), 0, 0),
+		list: list,
 		repo: repo,
 	}
 
@@ -32,7 +38,15 @@ func NewProjectsListViewModel(repo repository.ProjectsRepository) projectsListVi
 func (m projectsListViewModel) Init() tea.Cmd { return nil }
 
 func (m projectsListViewModel) View() string {
-	return ui.WrapperStyle.Render(m.list.View())
+	listTitle := ui.MagentaTextStyle.Render("Select Project ...")
+
+	return ui.WrapperStyle.Render(
+		lipgloss.JoinVertical(
+			lipgloss.Top,
+			listTitle,
+			m.list.View(),
+		),
+	)
 }
 
 func (m projectsListViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -52,28 +66,36 @@ func (m projectsListViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {
 
+		case "esc":
+			return m, nil
+
 		case "enter":
+			if project, ok := m.list.SelectedItem().(model.Project); ok {
+				return m, tea.Batch(tui.NewChangeViewWithProject(project, tui.TASKS_LIST_VIEW), tea.WindowSize())
+			} else {
+				return m, nil
+			}
+
+		case "e":
 			project, ok := m.list.SelectedItem().(model.Project)
 
 			if ok {
-				tui.State.SetProject(project)
+				return m, tea.Batch(tui.NewChangeViewWithProject(project, tui.CREATE_PROJECT_VIEW), tea.WindowSize())
 			}
-
-			return m, tea.Batch(tui.NewChangeViewCmd(tui.TASKS_LIST_VIEW), tea.WindowSize())
 
 		case "a":
 			return m, tea.Batch(tui.NewChangeViewCmd(tui.CREATE_PROJECT_VIEW), tea.WindowSize())
+
+		case "ctrl+c":
+			return m, tea.Quit
 
 		case "X":
 			project, ok := m.list.SelectedItem().(model.Project)
 
 			if ok {
-				tui.State.SetProject(project)
+				return m, tea.Batch(tui.NewChangeViewWithProject(project, tui.DELETE_PROJECT_VIEW), tea.WindowSize())
 			}
-
-			return m, tea.Batch(tui.NewChangeViewCmd(tui.DELETE_PROJECT_VIEW), tea.WindowSize())
 		}
-
 	}
 
 	m.list, cmd = m.list.Update(msg)

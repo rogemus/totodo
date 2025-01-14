@@ -14,14 +14,18 @@ func Test_GetProjects(t *testing.T) {
 	empty_list := make([]model.Project, 0)
 	createdDate, _ := time.Parse("2006-01-02 15:04:05", "2024-09-08 19:15:17")
 	project_1 := model.Project{
-		Id:      1,
-		Name:    "test project",
-		Created: createdDate,
+		Id:             1,
+		Name:           "test project",
+		Created:        createdDate,
+		TasksCount:     0,
+		TasksDoneCount: 0,
 	}
 	project_2 := model.Project{
-		Id:      2,
-		Name:    "test project 2",
-		Created: createdDate,
+		Id:             2,
+		Name:           "test project 2",
+		Created:        createdDate,
+		TasksCount:     0,
+		TasksDoneCount: 0,
 	}
 	projects := append(empty_list, project_1)
 	projects = append(projects, project_2)
@@ -51,14 +55,18 @@ func Test_GetProjects(t *testing.T) {
 				"id",
 				"name",
 				"created",
+				"tasksDoneCount",
+				"tasksCount",
 			}
 			expectedRows := sqlmock.NewRows(columns)
 
-			for _, task := range test.expected {
+			for _, project := range test.expected {
 				expectedRows.AddRow(
-					task.Id,
-					task.Name,
-					task.Created,
+					project.Id,
+					project.Name,
+					project.Created,
+					project.TasksDoneCount,
+					project.TasksCount,
 				)
 			}
 
@@ -66,7 +74,24 @@ func Test_GetProjects(t *testing.T) {
         SELECT
           p.id,
           p.name,
-          p.created
+          p.created,
+          (
+            SELECT
+              COUNT(*)
+            FROM
+              tasks AS t
+            WHERE
+              t.projectId == p.id AND
+              t.status == 'done'
+          ) as tasksDoneCount,
+          (
+            SELECT
+              COUNT(*)
+            FROM
+              tasks AS t
+            WHERE
+              t.projectId == p.id
+          ) as tasksCount
         FROM
           projects AS p
         ORDER BY
