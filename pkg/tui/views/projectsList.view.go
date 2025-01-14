@@ -9,6 +9,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type projectsListViewModel struct {
@@ -20,9 +21,14 @@ type projectsListViewModel struct {
 func NewProjectsListViewModel(repo repository.ProjectsRepository) projectsListViewModel {
 	projects, _ := repo.GetProjects()
 	items := utils.ConvertToListitem(projects)
+	list := list.New(items, model.NewProjectItemDelegate(), 0, 0)
+	list.SetShowStatusBar(false)
+	list.SetShowHelp(false)
+	list.SetShowTitle(false)
+	list.Title = "Select Project..."
 
 	m := projectsListViewModel{
-		list: list.New(items, list.NewDefaultDelegate(), 0, 0),
+		list: list,
 		repo: repo,
 	}
 
@@ -32,7 +38,15 @@ func NewProjectsListViewModel(repo repository.ProjectsRepository) projectsListVi
 func (m projectsListViewModel) Init() tea.Cmd { return nil }
 
 func (m projectsListViewModel) View() string {
-	return ui.WrapperStyle.Render(m.list.View())
+	listTitle := ui.MagentaTextStyle.Render("Select Project ...")
+
+	return ui.WrapperStyle.Render(
+		lipgloss.JoinVertical(
+			lipgloss.Top,
+			listTitle,
+			m.list.View(),
+		),
+	)
 }
 
 func (m projectsListViewModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {

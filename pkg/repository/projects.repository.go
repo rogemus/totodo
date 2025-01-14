@@ -48,6 +48,8 @@ func (r *projectsRepository) GetProject(id int) (model.Project, error) {
 		&project.Id,
 		&project.Name,
 		&project.Created,
+		&project.TasksDoneCount,
+		&project.TasksCount,
 	)
 
 	if err != nil {
@@ -78,6 +80,8 @@ func (r *projectsRepository) GetProjects() ([]model.Project, error) {
 			&project.Id,
 			&project.Name,
 			&project.Created,
+			&project.TasksDoneCount,
+			&project.TasksCount,
 		)
 
 		if err != nil {
